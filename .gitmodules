@@ -1,0 +1,9 @@
+[submodule ".\\AnglerED\\vendor\\GLFW"]
+	path = .\\AnglerED\\vendor\\GLFW
+	url = https://github.com/glfw/glfw
+[submodule "tools/tinyobjloader"]
+	path = tools/tinyobjloader
+	url = https://github.com/tinyobjloader/tinyobjloader
+[submodule "libs/spdlog"]
+	path = libs/spdlog
+	url = https://github.com/gabime/spdlog

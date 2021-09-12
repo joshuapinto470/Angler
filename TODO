@@ -1,0 +1,19 @@
+✔️ -> Implemented but needs to be better
+✅ -> Completed
+
+Bugs
+- Fix environment maps (currently does not UV map correctly)
+- Fix dielectric material
+- Out of bounds texture when y < 2
+- Large images crash AnglerED.
+
+Features
+- Implement image buffer in camera class
+- Full texture support
+- .obj model loader ✔️
+- AnglerRT -> AnglerED communication
+- Image Buffer (for openGL texture implementation)
+- Image output in AnglerED ✔️
+- Build scene in AnglerED
+- Multithreading
+- Implementation of a accelaration model BVH, K-Trees etc.
