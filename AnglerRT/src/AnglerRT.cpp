@@ -25,32 +25,30 @@ void RenderScene(const Scene& scene, const Camera& camera, Options& options){
     options.isRenderActive = true;
     options.progress = 0.0f;
     options.image = nullptr;
+    std::shared_ptr<PNG> myImage = std::make_shared<PNG>("Rendered.png", options.WIDTH, options.HEIGHT);
 
-    int image_height = options.iHeight;
-    int image_width = options.iWidth;
-    int samples_per_pixel = options.samples_per_pixel;
-    int max_depth = options.max_depth;  
+    int image_height = options.HEIGHT;
+    int image_width = options.WIDTH;
+    int samples_per_pixel = options.SAMPLES_PER_PIXEL;
+    int max_depth = options.MAX_DEPTH;  
 
     spdlog::info("Starting Render");
 
-    std::shared_ptr<PNG> myImage = std :: make_shared<PNG>("Rendered.png", options.iWidth, options.iHeight);
+    Float im_width  = (Float) 1.0 / (image_width - 1);
+    Float im_height = (Float) 1.0 / (image_height - 1);
 
-    //PNG myImage("Rendered.png", options.iWidth, options.iHeight);
-    Float im_width  = (Float) 1.0 / (image_width + 1);
-    Float im_height = (Float) 1.0 / (image_height + 1);
-
-    float img_height = (float) 1.0 / image_height;
+    float img_height_inv = (float) 1.0 / image_height;
 
     for(int j = image_height - 1; j >= 0; --j)
     {
-        options.progress = (float) (image_height - j) * img_height;// / image_height;
+        options.progress = (float) (image_height - j) * img_height_inv;// / image_height;
         for(int i = 0; i < image_width; ++i)
         {
             Color pixel_color(0, 0, 0);
             for (int s = 0; s < samples_per_pixel; ++s)
             {
-                auto u = (i + random_double()) * im_width; // / (image_width - 1);
-                auto v = (j + random_double()) * im_height;   // / (image_height - 1);
+                Float u = (i + random_double()) * im_width; // / (image_width - 1);
+                Float v = (j + random_double()) * im_height;   // / (image_height - 1);
 
                 Ray ray =  camera.get_ray(u, v);
                 pixel_color = pixel_color +  Trace(ray, scene, max_depth);

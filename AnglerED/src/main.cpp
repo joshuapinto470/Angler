@@ -142,10 +142,10 @@ int main()
     float aspect_ratio = 16.0 / 9.0;
 
     Options options{};
-    options.max_depth = 4;
-    options.samples_per_pixel = 60;
-    options.iWidth = 512;
-    options.iHeight = static_cast<int>(options.iWidth / aspect_ratio);
+    options.MAX_DEPTH = 4;
+    options.SAMPLES_PER_PIXEL = 60;
+    options.WIDTH = 512;
+    options.HEIGHT = static_cast<int>(options.WIDTH / aspect_ratio);
     options.image = nullptr;
 
     int cameraFOV = 35.0;
@@ -227,12 +227,12 @@ int main()
         {    
             ImGui::Begin("Renderer settings");
             ImGui::Text("AnglerRT Settings");
-            ImGui::InputInt("Max Depth", &options.max_depth);
-            ImGui::InputInt("Samples", &options.samples_per_pixel);
+            ImGui::InputInt("Max Depth", &options.MAX_DEPTH);
+            ImGui::InputInt("Samples", &options.SAMPLES_PER_PIXEL);
             ImGui::InputFloat("Aspect Ratio ", &aspect_ratio);
-            ImGui::InputInt("Image Width", &options.iWidth);
-            options.iHeight = static_cast<int>(options.iWidth / aspect_ratio);
-            ImGui::Text("Resolution (%d X %d)", options.iWidth, options.iHeight);
+            ImGui::InputInt("Image Width", &options.WIDTH);
+            options.HEIGHT = static_cast<int>(options.WIDTH / aspect_ratio);
+            ImGui::Text("Resolution (%d X %d)", options.WIDTH, options.HEIGHT);
             ImGui::Separator();
             ImGui::Text("Camera Settings");
             ImGui::InputInt("Camera FOV", &cameraFOV);
@@ -271,17 +271,17 @@ int main()
                 spdlog::info("AnglerED : Binding texture data");
                 //options.image->GammaCorrect();
                 unsigned char* buffer = options.image->getBuffer().data();
-                if(!BindImageTexture(buffer, &renderedImageTexture, options.iWidth, options.iHeight))
+                if(!BindImageTexture(buffer, &renderedImageTexture, options.WIDTH, options.HEIGHT))
                     spdlog::warn("AnglerED : Binding texture failed");
                 needToBindTexture = false;
             }
 
             ImGui::Begin("Rendered Image");
             ImGui::Text("Image Size = %d x %d",
-                        std::min(options.iWidth, display_width - 100), 
-                        std::min(options.iHeight, display_height - 100));
+                        std::min(options.WIDTH, display_width - 100), 
+                        std::min(options.HEIGHT, display_height - 100));
 
-            ImGui::Image((void*)(intptr_t)renderedImageTexture, ImVec2(options.iWidth, options.iHeight));
+            ImGui::Image((void*)(intptr_t)renderedImageTexture, ImVec2(options.WIDTH, options.HEIGHT));
             ImGui::End();
             
         }

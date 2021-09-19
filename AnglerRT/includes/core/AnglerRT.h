@@ -25,15 +25,15 @@
 struct Options{
     Options() = default;
     
-    int iWidth, iHeight;
-    int samples_per_pixel;
-    int max_depth;
+    int WIDTH, HEIGHT;
+    int SAMPLES_PER_PIXEL;
+    int MAX_DEPTH;
     // stats
     float progress;
     bool isRenderActive;
 
-    std :: shared_ptr<PNG> image;
+    std::shared_ptr<PNG> image;
 };
 
-Color ray_color(const Ray&, const Scene&, int);
+Color Trace(const Ray&, const Scene&, int);
 void RenderScene(const Scene&, const Camera&, Options&);
