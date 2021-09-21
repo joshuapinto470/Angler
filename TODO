@@ -1,4 +1,5 @@
-✔️ -> Implemented but needs to be better
+✔️ -> Implemented but needs improvement
+🟩 -> Incomplete / In progress
 ✅ -> Completed
 
 Bugs
@@ -16,4 +17,4 @@ Features
 - Image output in AnglerED ✔️
 - Build scene in AnglerED
 - Multithreading
-- Implementation of a accelaration model BVH, K-Trees etc.
+- Implementation of a accelaration model BVH, K-Trees etc. 🟩

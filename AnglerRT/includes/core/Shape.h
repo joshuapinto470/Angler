@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ray.h"
+#include "Bounds.h"
 
 class Material;
 
@@ -23,5 +24,6 @@ struct Interaction{
 
 class Shape{
     public :
-        virtual bool Hit(const Ray&, Float, Float, Interaction&) const = 0;    
+        virtual bool Hit(const Ray&, Float, Float, Interaction&) const = 0;
+        virtual bool Bound(Float, Float, Bounds3&) const = 0;    
 };

@@ -12,7 +12,6 @@ Color Trace(const Ray& ray, const Scene& scene, int max_depth)
         Ray outRay;
         Color mColor;
         if(inter.material->BSDF(ray, mColor, inter, outRay)){
-            // The material bounces light.
             return (mColor * Trace(outRay, scene, max_depth - 1));
         }
         return mColor;

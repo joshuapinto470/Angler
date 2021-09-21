@@ -43,6 +43,7 @@ class Triangle : public Shape{
         {};
 
         bool Hit(const Ray&, Float, Float, Interaction&) const override;
+        bool Bound(Float time0, double time1, Bounds3& output_box) const override;
 };
 
 // std::vector<std::shared_ptr<Shape>> CreateTriangleMesh(float* v, float* n, int* vi, int nTriangles){

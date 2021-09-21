@@ -19,6 +19,21 @@ bool Scene :: Hit(const Ray& ray, Float t_min, Float t_max, Interaction& inter) 
     return HitAnything;
 }
 
+bool Scene::Bound(Float time0, double time1, Bounds3& output_box) const{
+    if(objects.empty()) return false;
+
+    Bounds3 temp_box;
+    bool first_box = true;
+
+    for(const auto& object : objects){
+        if(!object->Bound(time0, time1, temp_box)) return false;
+        output_box = first_box ? temp_box : Union(output_box, temp_box);
+        first_box = false;
+    }
+
+    return true;
+}
+
 void Scene::SetEnvironmentTexture(const std::shared_ptr<EnvironmentTexture>& texture) {
     mTexture = texture;
 }
@@ -29,7 +44,28 @@ Color Scene::GetEnvironmentTexture(const Ray& ray) const {
     return {0.02, 0.02, 0.075};
 }
 
+size_t Scene::GetObjectsSize() const {
+    return objects.size();
+}
+
+std::vector<std::shared_ptr<Shape>> Scene::GetObjects() const{
+    return objects;
+}
+
 Scene::Scene() {
     mTexture = nullptr;
+}
+
+Bounds3 Union(Bounds3 box0, Bounds3 box1){
+    Vec3d small(
+         fmin(box0.min().x(), box1.min().x()),
+         fmin(box0.min().y(), box1.min().y()),
+         fmin(box0.min().z(), box1.min().z()));
+
+    Vec3d big(fmax(box0.max().x(), box1.max().x()),
+               fmax(box0.max().y(), box1.max().y()),
+               fmax(box0.max().z(), box1.max().z()));
+
+    return Bounds3(small,big);
 }
 

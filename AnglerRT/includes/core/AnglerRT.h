@@ -6,6 +6,7 @@
 #include "Ray.h"
 #include "Shape.h"
 #include "Utilities.h"
+#include "Bounds.h"
 #include "Material.h"
 #include "Random.h"
 #include "EnvironmentMap.h"

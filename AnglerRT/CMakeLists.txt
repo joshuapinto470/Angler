@@ -1,6 +1,7 @@
 project(AnglerRT)
 
 include_directories("includes"
+                    "includes/accelerators"
                     "includes/core"
                     "includes/shapes"
                     "includes/materials"
@@ -26,6 +27,7 @@ add_library(AnglerRT src/AnglerRT.cpp
         src/core/EnvironmentMap.cpp
         src/core/Scene.cpp
         src/core/Probe.cpp
+        src/accelerators/BVH.cpp
         )
 
 target_link_libraries(AnglerRT PRIVATE spdlog)

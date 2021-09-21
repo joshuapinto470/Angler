@@ -5,6 +5,7 @@ include_directories(
         "includes/imgui"
         "../external_includes"
         "../AnglerRT/includes/core"
+        "../AnglerRT/includes/accelerators"
         "../AnglerRT/includes/materials"
         "../AnglerRT/includes/shapes"
         "../AnglerRT/includes/image_formats"

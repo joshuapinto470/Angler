@@ -17,4 +17,5 @@ class Plane : public Shape{
         Y(B, C, D, mat){};
 
         bool Hit(const Ray&, Float, Float, Interaction&) const override;
+        bool Bound(Float time0, double time1, Bounds3& output_box) const override;
 };

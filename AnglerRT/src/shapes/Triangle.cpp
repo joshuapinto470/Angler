@@ -26,3 +26,7 @@ bool Triangle :: Hit(const Ray& ray, Float t_min, Float t_max, Interaction& inte
 
     return false;
 }
+
+bool Triangle::Bound(Float time0, double time1, Bounds3& output_box) const{
+    return true;
+}

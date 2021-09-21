@@ -1,13 +1,36 @@
 #pragma once
+#include "Utilities.h"
+#include "Ray.h"
 
-template <typename T>
 class Bounds3{
-private:
-    Vec3<T> pMin, pMax;
-};
+    public:
+        Bounds3() {};
+        Bounds3(const Point& a, const Point& b){
+            minimum = a;
+            maximum = b;
+        }
 
-template <typename T>
-class Bounds2{
-private:
-    Vec2<T> pMin, pMax;
+        bool hit(const Ray& ray, Float t_min, Float t_max) const{
+            for(int a = 0; a < 3; a++){
+                Float invD = 1.0 / ray.Direction()[a];
+                auto t0 = (minimum[a] - ray.Origin()[a]) * invD;
+                auto t1 = (maximum[a] - ray.Origin()[a]) * invD;
+
+                if(invD < 0.0f)
+                    std::swap(t0, t1);
+
+                t_min = t0 > t_min ? t0 : t_min;
+                t_max = t1 < t_max ? t1 : t_max;
+
+                if(t_max <= t_min)
+                    return false;
+            }
+            return true;
+        }
+
+        Point min() {return minimum;};
+        Point max() {return maximum;};
+
+    private:
+        Point maximum, minimum;
 };

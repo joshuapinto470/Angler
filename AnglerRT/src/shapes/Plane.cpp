@@ -13,3 +13,6 @@ bool Plane::Hit(const Ray& ray, Float t_min, Float t_max, Interaction& inter) co
     
     return false;
 } 
+bool Plane::Bound(Float time0, double time1, Bounds3& output_box) const{
+    return true;
+}

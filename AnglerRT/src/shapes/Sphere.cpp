@@ -1,7 +1,7 @@
 #include "Sphere.h"
 
 
-bool Sphere :: Hit(const Ray& ray, Float t_min, Float t_max, Interaction& inter) const {
+bool Sphere::Hit(const Ray& ray, Float t_min, Float t_max, Interaction& inter) const {
 
     Vec3f oc = ray.Origin() - mCenter;
     Float a = ray.Direction().LengthSquared();
@@ -28,5 +28,12 @@ bool Sphere :: Hit(const Ray& ray, Float t_min, Float t_max, Interaction& inter)
     /*
     BTW, Do we have to calculate the normal for every object?
     */
+    return true;
+}
+
+bool Sphere::Bound(Float time0, double time1, Bounds3& output_box) const{
+    output_box = Bounds3( 
+        mCenter - Vec3d(mRadius, mRadius, mRadius),
+        mCenter + Vec3d(mRadius, mRadius, mRadius));
     return true;
 }

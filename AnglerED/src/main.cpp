@@ -11,6 +11,7 @@
 
 #include "AnglerRT.h"
 #include "Lambertian.h"
+#include "BVH.h"
 
 #include "obj2angler.h"
 
@@ -59,7 +60,8 @@ Scene random_scene() {
     auto material3 = std::make_shared<Metallic>(Color(0.7, 0.6, 0.5), 0.0);
     world.Add(std::make_shared<Sphere>(Vec3f(4, 1, 0), 1.0, material3));
 
-    return world;
+    //return world;
+    return Scene(std::make_shared<BVH>(world, 0.0, 1.0));;
 }
 
 Scene MeshScene(){
@@ -153,7 +155,7 @@ int main()
     //Camera camera(cameraFOV, aspect_ratio, Point(14, 2, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
     Camera camera(cameraFOV, aspect_ratio, Point(0, 0, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
 
-    Scene world = QuickScene();
+    Scene world = random_scene();
 
 
     std :: shared_ptr<EnvironmentTexture> envTex = std :: make_shared<EnvironmentTexture>(R"(D:\Documents\C++\Old Projects\Angler\Textures\round_platform_2k.png)");
