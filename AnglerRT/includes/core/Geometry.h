@@ -163,6 +163,7 @@ class Vec3{
 	Vec3<T> operator/(double);
 	Vec3<T> operator-(const Vec3<T>&);
 	Vec3<T> operator-() const;
+	T operator[](int&) const;
 
 	void Print(){
         std :: cout << "< " << _x << ", " << _y << ", " << _z << " >\n";
@@ -174,6 +175,18 @@ class Vec3{
 template <typename T>
 inline Vec3<T> Vec3<T> :: operator +(const Vec3<T>& v){
 	return Vec3<T>(_x + v._x, _y + v._y, _z + v._z);
+}
+
+template <typename T>
+inline T Vec3<T> :: operator[](int& a) const{
+	if(a == 0) return _x;
+	if(a == 1) return _y;
+	if(a == 2) return _z;
+	
+	#ifndef NDEBUG
+		spdlog::warn("Vector component out of range!");
+		return 0;
+	#endif
 }
 
 template <typename T>
