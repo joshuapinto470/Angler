@@ -12,9 +12,11 @@ private:
     unsigned Width{}, Height{};
 public:
     PNG() = default;
-    explicit PNG(const char* FileName, unsigned w, unsigned h);
-    void GammaCorrect();
+    PNG(const char* FileName, unsigned w, unsigned h);
     ~PNG();
+
+    void SaveFile();
+    void GammaCorrect();
     void Write(const Color &) override;
 
     std::vector<uint8_t> getBuffer(){

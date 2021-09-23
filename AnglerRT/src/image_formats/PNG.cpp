@@ -16,6 +16,10 @@ void PNG::Write(const Color &color) {
 }
 
 PNG::~PNG() {
+    SaveFile();
+}
+
+void PNG::SaveFile(){
     std :: vector<unsigned char> encodedPNG;
     GammaCorrect();
     unsigned error = lodepng::encode(encodedPNG, buffer, Width, Height);
