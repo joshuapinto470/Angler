@@ -2,8 +2,6 @@
 AnglerRT is a simple Ray Tracing engine.  
 AnglerED is a optional GUI interface using [imgui](https://github.com/ocornut/imgui) to adjust different settings in AnglerRT.
 
-![AnglerRT](https://github.com/botmelive/Angler/blob/master/tools/img.png)
-
 It is roughly based on the [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) book.
 
 
@@ -13,7 +11,7 @@ I use the MinGW GCC compiler for windows. This project is untested on other comp
 
 By default AnglerRT is compiled as a .lib file and linked against AnglerED.
 
-<ins>**Downloading the repository:**</ins>  
+**Downloading the repository:**  
 Start by cloning the repository with  
 `git clone --recursive https://github.com/botmelive/Angler.git`.
 
