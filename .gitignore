@@ -3,3 +3,4 @@
 .vs
 *.png
 *.*ml
+.clang-*

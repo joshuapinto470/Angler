@@ -1,17 +1,17 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include <algorithm>
 #include <cstdio>
 #include <thread>
 #include <utility>
-#include <algorithm>
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
 #include "AnglerRT.h"
-#include "Lambertian.h"
 #include "BVH.h"
+#include "Render.h"
 
 #include "obj2angler.h"
 
@@ -21,7 +21,7 @@ Scene random_scene() {
     Scene world;
 
     auto ground_material = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
-    world.Add(std::make_shared<Sphere>(Vec3f(0,-1000,0), 1000, ground_material));
+    world.Add(std::make_shared<Sphere>(Vec3f(0, -1000, 0), 1000, ground_material));
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
@@ -44,7 +44,7 @@ Scene random_scene() {
                     world.Add(std::make_shared<Sphere>(center, 0.2, sphere_material));
                 } else {
                     // glass
-                    sphere_material = std::make_shared<Dielectric>(1.5);
+                    sphere_material = std::make_shared<Dielectric>(0.7);
                     world.Add(std::make_shared<Sphere>(center, 0.2, sphere_material));
                 }
             }
@@ -55,16 +55,17 @@ Scene random_scene() {
     world.Add(std::make_shared<Sphere>(Vec3f(0, 1, 0), 1.0, material1));
 
     auto material2 = std::make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
-    world.Add(std::make_shared<Sphere>(Vec3f (-4, 1, 0), 1.0, material2));
+    world.Add(std::make_shared<Sphere>(Vec3f(-4, 1, 0), 1.0, material2));
 
     auto material3 = std::make_shared<Metallic>(Color(0.7, 0.6, 0.5), 0.0);
     world.Add(std::make_shared<Sphere>(Vec3f(4, 1, 0), 1.0, material3));
 
-    //return world;
-    return Scene(std::make_shared<BVH>(world, 0.0, 1.0));;
+    // return world;
+    return Scene(std::make_shared<BVH>(world, 0.0, 1.0));
+    ;
 }
 
-Scene MeshScene(){
+Scene MeshScene() {
     Scene world;
 
     std::vector<std::vector<std::shared_ptr<Shape>>> mesh = LoadMeshFromFile();
@@ -73,39 +74,36 @@ Scene MeshScene(){
     // std :: shared_ptr<Material> material3 = std :: make_shared<Metallic>(Color(0.8, 0.8, 0.5), 0.01);
     // std :: shared_ptr<Material> glass_mat = std :: make_shared<Glass>(Color(1.0, 1.0, 1.0), 1.0, 1.0);
 
-
     // world.Add( std :: make_shared<Sphere>(Point(0, 0, -1), 0.5, material1));
     // world.Add( std :: make_shared<Sphere>(Point(-2, 0, -1), 0.5, glass_mat));
     // world.Add( std :: make_shared<Sphere>(Point(2, 0, -1), 0.5, material3));
 
-    for (auto& i : mesh){
-        for(auto& j : i)
+    for (auto &i : mesh) {
+        for (auto &j : i)
             world.Add(j);
     }
     return world;
 }
 
-Scene QuickScene(){
+Scene QuickScene() {
     Scene world;
-    
-    std :: shared_ptr<Material> material1 = std :: make_shared<Dielectric>(1.0);
-    std :: shared_ptr<Material> material3 = std :: make_shared<Metallic>(Color(0.8, 0.8, 0.5), 0.01);
-    std :: shared_ptr<Material> glass_mat = std :: make_shared<Glass>(Color(1.0, 1.0, 1.0), 1.0, 1.0);
 
+    std ::shared_ptr<Material> material1 = std ::make_shared<Dielectric>(1.0);
+    std ::shared_ptr<Material> material3 = std ::make_shared<Metallic>(Color(0.8, 0.8, 0.5), 0.01);
+    std ::shared_ptr<Material> glass_mat = std ::make_shared<Glass>(Color(1.0, 1.0, 1.0), 1.0, 1.0);
 
-    world.Add( std :: make_shared<Sphere>(Point(0, 0, -1), 0.5, material1));
-    world.Add( std :: make_shared<Sphere>(Point(-2, 0, -1), 0.5, glass_mat));
-    world.Add( std :: make_shared<Sphere>(Point(2, 0, -1), 0.5, material3));
+    world.Add(std ::make_shared<Sphere>(Point(0, 0, -1), 0.5, material1));
+    world.Add(std ::make_shared<Sphere>(Point(-2, 0, -1), 0.5, glass_mat));
+    world.Add(std ::make_shared<Sphere>(Point(2, 0, -1), 0.5, material3));
 
     return world;
 }
 
-bool BindImageTexture(unsigned char* buffer, GLuint* out_texture, int image_width, int image_height)
-{
+bool BindImageTexture(unsigned char *buffer, GLuint *out_texture, int image_width, int image_height) {
 
     // Load from buffer
-    unsigned char* image_data = buffer;
-    if (image_data == NULL)
+    unsigned char *image_data = buffer;
+    if (image_data == nullptr)
         return false;
 
     // Create a OpenGL texture identifier
@@ -116,7 +114,8 @@ bool BindImageTexture(unsigned char* buffer, GLuint* out_texture, int image_widt
     // Setup filtering parameters for display
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                    GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
 
     // Upload pixels into texture
@@ -130,15 +129,14 @@ bool BindImageTexture(unsigned char* buffer, GLuint* out_texture, int image_widt
     return true;
 }
 
-int main()
-{
+int main() {
 
-    #ifndef NDEBUG
-        spdlog::info("DEBUG BUILD");
-        spdlog::info(__TIMESTAMP__);
-    #endif
+#ifndef NDEBUG
+    spdlog::info("DEBUG BUILD");
+    spdlog::info(__TIMESTAMP__);
+#endif
 
-    spdlog::info("CPU Arch : {} bit", sizeof(void*) * 8);
+    spdlog::info("CPU Arch : {} bit", sizeof(void *) * 8);
 
     // AnglerRT initialization.
     float aspect_ratio = 16.0 / 9.0;
@@ -152,54 +150,54 @@ int main()
 
     int cameraFOV = 35.0;
 
-    //Camera camera(cameraFOV, aspect_ratio, Point(14, 2, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
-    Camera camera(cameraFOV, aspect_ratio, Point(0, 0, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
+    // Camera camera(cameraFOV, aspect_ratio, Point(14, 2, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
+    Camera camera(cameraFOV, aspect_ratio, Point(0, 3, 10), Point(0, 0, 0), Vec3f(0, 1, 0));
 
     Scene world = random_scene();
 
-
-    std :: shared_ptr<EnvironmentTexture> envTex = std :: make_shared<EnvironmentTexture>(R"(D:\Documents\C++\Old Projects\Angler\Textures\round_platform_2k.png)");
+    std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(
+        "D:/Documents/C++/Angler/Angler_ED_RT/Angler/Textures/UV_Debug.png");
     world.SetEnvironmentTexture(envTex);
 
     // when isRenderActive is set to true the renderer is active.
     // Dont start another render process until the current one is finished or stopped.
     options.isRenderActive = false;
 
-    //RenderScene(world, camera, options);
+    // RenderScene(world, camera, options);
 
-    GLFWwindow* window;
+    GLFWwindow *window;
 
-    const char* glsl_version = "#version 130";
+    const char *glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    /* Initialize the library */
+    // Initialize the library
     if (!glfwInit())
         return -1;
 
     int display_width = 1280, display_height = 720;
 
-    /* Create a windowed mode window and its OpenGL context */
+    // Create a windowed mode window and its OpenGL context
     window = glfwCreateWindow(display_width, display_height, "AnglerED", nullptr, nullptr);
-    if (!window)
-    {
+    if (!window) {
         glfwTerminate();
         return -1;
     }
 
-    /* Make the window's context current */
+    // Make the window's context current
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
     bool err = gladLoadGL() == 0;
-    if(err){
+    if (err) {
         spdlog::error("OpenGL Error!");
         return 1;
     }
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
 
     ImGui::StyleColorsDark();
 
@@ -211,9 +209,10 @@ int main()
 
     GLuint renderedImageTexture = 0;
 
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
+    Render renderer(world, camera, options);
+
+    // Loop until the user closes the window
+    while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -223,10 +222,9 @@ int main()
         // #ifndef NDEBUG
         // ImGui::ShowDemoWindow(&show_demo_window);
         // #endif
-        
+
         // Dont modify renderer setting while the renderer is active.
-        if(!options.isRenderActive)
-        {    
+        if (!options.isRenderActive) {
             ImGui::Begin("Renderer settings");
             ImGui::Text("AnglerRT Settings");
             ImGui::InputInt("Max Depth", &options.MAX_DEPTH);
@@ -238,61 +236,73 @@ int main()
             ImGui::Separator();
             ImGui::Text("Camera Settings");
             ImGui::InputInt("Camera FOV", &cameraFOV);
-            static float p[4] = { 0.f, 0.f, 3.f, 0.44f };
+            static float p[4] = { 0.f, 3.f, 10.f, 0.44f };
             static float q[4] = { 0.0f, 0.0f, 0.0f, 0.44f };
-            if(ImGui::InputFloat3("Look From", p) ||
-            ImGui::InputFloat3("Look At", q))
-                camera = Camera(cameraFOV, aspect_ratio, Point(p[0], p[1], p[2]), Point(q[0], q[1], q[2]), Vec3f(0, 1, 0));
+            if (ImGui::InputFloat3("Look From", p) || ImGui::InputFloat3("Look At", q))
+                camera =
+                    Camera(cameraFOV, aspect_ratio, Point(p[0], p[1], p[2]), Point(q[0], q[1], q[2]), Vec3f(0, 1, 0));
             ImGui::End();
         }
 
         {
-            ImGui::Begin("Scene Builder");
-            ImGui::Text("Build a scene to render.");
+            ImGui::Begin("Scene Settings");
+            ImGui::Text("Resolution (%d X %d)", options.WIDTH, options.HEIGHT);
+            ImGui::Text("Max Depth: %d", options.MAX_DEPTH);
+            ImGui::Text("Samples: %d", options.SAMPLES_PER_PIXEL);
+            ImGui::Text("Aspect Ratio: %.2f", aspect_ratio);
+            ImGui::Separator();
+            ImGui::Text("Camera FOV: %d", cameraFOV);
             ImGui::End();
         }
 
         {
             ImGui::Begin("AnglerRT");
             ImGui::Text("Render Window");
-            
-            if(ImGui::Button("Render Image") && !options.isRenderActive) {
+
+            if (ImGui::Button("Render Image") && !options.isRenderActive) {
                 options.image = nullptr;
-                std::thread render(RenderScene, std::ref(world), std::ref(camera), std::ref(options));
+
+                std::thread render(&Render::StartRender, renderer);
                 render.detach();
+
+                // renderer.StartRender();
                 needToBindTexture = true;
-            }
-            else{
-                ImGui::Text("Progress : %.2f %", options.progress * 100);
+            } else {
+                ImGui::Text("Progress : %.2f %%", options.progress * 100);
             }
             ImGui::End();
         }
 
-        if(!options.isRenderActive && options.image){            
-            if(needToBindTexture){
+        if (!options.isRenderActive && options.image) {
+            if (needToBindTexture) {
                 spdlog::info("AnglerED : Binding texture data");
-                //options.image->GammaCorrect();
-                unsigned char* buffer = options.image->getBuffer().data();
-                if(!BindImageTexture(buffer, &renderedImageTexture, options.WIDTH, options.HEIGHT))
+                // options.image->GammaCorrect();
+
+                std::shared_ptr<uint8_t[]> mBuffer = options.image->getBufferCopy();
+                unsigned char *buffer = new unsigned char[options.WIDTH * options.HEIGHT * 4];
+                for(int i = 0; i < options.WIDTH * options.HEIGHT * 4; i++){
+                    buffer[i] = 150;
+                }
+
+                if (!BindImageTexture(buffer, &renderedImageTexture, options.WIDTH, options.HEIGHT))
                     spdlog::warn("AnglerED : Binding texture failed");
                 needToBindTexture = false;
             }
 
             ImGui::Begin("Rendered Image");
-            ImGui::Text("Image Size = %d x %d",
-                        std::min(options.WIDTH, display_width - 100), 
+            ImGui::Text("Image Size = %d x %d", std::min(options.WIDTH, display_width - 100),
                         std::min(options.HEIGHT, display_height - 100));
 
-            ImGui::Image((void*)(intptr_t)renderedImageTexture, ImVec2(options.WIDTH, options.HEIGHT));
+            ImGui::Image((void *)(intptr_t)renderedImageTexture, ImVec2(options.WIDTH, options.HEIGHT));
             ImGui::End();
-            
         }
         ImGui::Render();
 
-        /* Render here */
+        // Render here
+        glClearColor(0.12f, 0.14f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        /* Swap front and back buffers */
+        // Swap front and back buffers
         glfwSwapBuffers(window);
     }
 

@@ -35,4 +35,10 @@ add_executable(AnglerED
         )
 
 #target_link_libraries(AnglerED PRIVATE AnglerRT ${SPDLOG_LIB} glfw opengl32)
+if(WIN32)
 target_link_libraries(AnglerED PRIVATE AnglerRT spdlog glfw opengl32)
+endif(WIN32)
+
+if(UNIX)
+target_link_libraries(AnglerED PRIVATE AnglerRT spdlog glfw)
+endif(UNIX)

@@ -41,7 +41,10 @@ void Scene::SetEnvironmentTexture(const std::shared_ptr<EnvironmentTexture>& tex
 Color Scene::GetEnvironmentTexture(const Ray& ray) const {
     if(mTexture)
         return mTexture->MapTexture(ray);
-    return {0.02, 0.02, 0.075};
+    
+    Vec3f unit_direction = ray.Direction().Normalize();
+    auto t = 0.5*(unit_direction.y() + 1.0);
+    return (1.0 - t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);
 }
 
 size_t Scene::GetObjectsSize() const {

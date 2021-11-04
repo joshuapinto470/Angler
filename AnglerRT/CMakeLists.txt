@@ -27,6 +27,7 @@ add_library(AnglerRT src/AnglerRT.cpp
         src/core/EnvironmentMap.cpp
         src/core/Scene.cpp
         src/core/Probe.cpp
+        src/core/ImageBuffer.cpp
         src/accelerators/BVH.cpp
         )
 

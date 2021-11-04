@@ -1,104 +1,84 @@
-#include "spdlog/spdlog.h"
-#include "AnglerRT.h"
+#include "Render.h"
 
-Color Trace(const Ray& ray, const Scene& scene, int max_depth)
-{
-    if(max_depth < 1)
-        return {0, 0, 0};
+Render::Render(const Scene &scene, const Camera &camera, Options &options) {
+    mScene = std::make_shared<Scene>(scene);
+    mCamera = std::make_shared<Camera>(camera);
+    mOptions = &options;
+
+    auto nThreads = std::thread::hardware_concurrency();
+    nThreads = (nThreads == 0) ? 1 : nThreads;
+    spdlog::info("Detected {} threads", nThreads);
+
+    options.isRenderActive = false;
+    options.progress = 0.0f;
+    options.image = nullptr;
+
+    WIDTH = options.WIDTH;
+    HEIGHT = options.HEIGHT;
+    samples_per_pixel = options.SAMPLES_PER_PIXEL;
+    max_depth = options.MAX_DEPTH;
+
+    width_inv = (Float)1.0 / (WIDTH - 1);
+    height_inv = (Float)1.0 / (HEIGHT - 1);
+    samples_inv = (Float)1.0 / samples_per_pixel;
+
+    mBuffer = std::make_shared<ImageBuffer>(WIDTH, HEIGHT);
+}
+
+void Render::StartRender() {
+    // TODO: Implement multi-threading support here.
+    // spawn multiple RenderScene instances with their own image buffers.
+    // combine the image buffers and set the Options.image attribute to the buffer.
+
+    // TODO: Implement tile based multithreading.
+    // TODO: Implement progressive multithreading.
+
+    mOptions->isRenderActive = true;
+
+    spdlog::info("Starting Render");
+    RenderScene();
+    // PNG tImage(*mBuffer);
+    spdlog::info("Render Done!");
+    mOptions->image = mBuffer;
+    mOptions->isRenderActive = false;
+}
+
+void Render::RenderScene() {
+
+    for (int j = HEIGHT - 1; j >= 0; --j) {
+        mOptions->progress = (float)(HEIGHT - j) * height_inv;
+
+        for (int i = 0; i < WIDTH; ++i) {
+            Color pixel_color(0, 0, 0);
+
+            for (int s = 0; s < samples_per_pixel; ++s) {
+                Float u = (i + random_double()) * width_inv;
+                Float v = (j + random_double()) * height_inv;
+
+                Ray ray = mCamera->get_ray(u, v);
+                pixel_color = pixel_color + Trace(ray, max_depth);
+            }
+
+            pixel_color = pixel_color * samples_inv;
+            mBuffer->Write(pixel_color);
+        }
+    }
+    mOptions->image = mBuffer;
+}
+
+Color Render::Trace(const Ray &ray, int max_depth) {
+    if (max_depth < 1)
+        return { 0, 0, 0 };
 
     Interaction inter;
 
-    if(scene.Hit(ray, 0.001, Infinity, inter)){
+    if (mScene->Hit(ray, 0.001, Infinity, inter)) {
         Ray outRay;
         Color mColor;
-        if(inter.material->BSDF(ray, mColor, inter, outRay)){
-            return (mColor * Trace(outRay, scene, max_depth - 1));
+        if (inter.material->BSDF(ray, mColor, inter, outRay)) {
+            return (mColor * Trace(outRay, max_depth - 1));
         }
         return mColor;
     }
-    return scene.GetEnvironmentTexture(ray);
+    return mScene->GetEnvironmentTexture(ray);
 }
-
-void RenderScene(const Scene& scene, const Camera& camera, Options& options){
-    
-    options.isRenderActive = true;
-    options.progress = 0.0f;
-    options.image = nullptr;
-    std::shared_ptr<PNG> myImage = std::make_shared<PNG>("Rendered.png", options.WIDTH, options.HEIGHT);
-
-    int image_height = options.HEIGHT;
-    int image_width = options.WIDTH;
-    int samples_per_pixel = options.SAMPLES_PER_PIXEL;
-    int max_depth = options.MAX_DEPTH;  
-
-    spdlog::info("Starting Render");
-
-    Float im_width  = (Float) 1.0 / (image_width - 1);
-    Float im_height = (Float) 1.0 / (image_height - 1);
-
-    float img_height_inv = (float) 1.0 / image_height;
-
-    for(int j = image_height - 1; j >= 0; --j)
-    {
-        options.progress = (float) (image_height - j) * img_height_inv;// / image_height;
-        for(int i = 0; i < image_width; ++i)
-        {
-            Color pixel_color(0, 0, 0);
-            for (int s = 0; s < samples_per_pixel; ++s)
-            {
-                Float u = (i + random_double()) * im_width; // / (image_width - 1);
-                Float v = (j + random_double()) * im_height;   // / (image_height - 1);
-
-                Ray ray =  camera.get_ray(u, v);
-                pixel_color = pixel_color +  Trace(ray, scene, max_depth);
-            }
-            pixel_color = pixel_color / samples_per_pixel;
-            //camera.getFlim()->Write(pixel_color);
-            myImage->Write(pixel_color);
-        }
-    }
-
-    //camera->flushFlim();
-    spdlog::info("Render Done!");
-    options.image = myImage;
-    options.isRenderActive = false;
-}
-
-/*
-int main(){
-
-    // Define the camera
-    Camera camera(cameraFOV, aspect_ratio, Point(0, 0, 1.4), Point(0, 0, -1), Vec3f(0, 1, 0));
-
-    // Define a scene.
-    // This will hold all the world objects. like shapes, lights environment maps etc..
-    Scene world;
-
-    // Define the materials to use for the scene.
-    std :: shared_ptr<Material> material1 = std :: make_shared<Lambertian>(Color(0.8, 0.1, 0.1));
-    std :: shared_ptr<Material> material2 = std :: make_shared<Metallic>(Color(0.9, 0.9, 0.9), 0.05);
-    std :: shared_ptr<Material> material3 = std :: make_shared<Emissive>(Color(1.0, 1.0, 1.0), 1);
-    std :: shared_ptr<Material> glass_mat = std :: make_shared<Glass>(Color(1.0, 1.0, 1.0), 1.0, 1.0);
-
-    // Add the objects to the scene.
-    // objects should be created as shared pointers.
-    world.Add( std :: make_shared<Sphere>(Point(0, 0, -1), 0.5, material1));
-    world.Add( std :: make_shared<Sphere>(Point(-2, 0, -1), 0.5, glass_mat));
-    world.Add( std :: make_shared<Sphere>(Point(2, 0, -1), 0.5, material3));
-
-    // Environment map (optional).
-    // by default it will use a interpolated value.
-    std :: shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(R"(D:\Documents\C++\Old Projects\AnglerRT\round_platform_2k.png)");
-    world.SetEnvironmentTexture(envTex);
-
-    // finally render the scene.
-    RenderScene(world, camera, options);
-
-    return 0;
-}
-*/
-
-class Render{
-public:
-    Color Trace();
-};

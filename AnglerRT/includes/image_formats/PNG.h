@@ -6,20 +6,23 @@
 #include <vector>
 
 class PNG : public Image {
-private:
-    std :: vector<uint8_t> buffer;
-    const char* fileName{};
-    unsigned Width{}, Height{};
-public:
+
+  public:
     PNG() = default;
-    PNG(const char* FileName, unsigned w, unsigned h);
+    PNG(const char *FileName, unsigned w, unsigned h);
+    PNG(const Image &image);
     ~PNG();
 
     void SaveFile();
     void GammaCorrect();
     void Write(const Color &) override;
+    unsigned getHeight() const override;
+    unsigned getWidth() const override;
+    std::unique_ptr<uint8_t[]> getBufferCopy() const override;
 
-    std::vector<uint8_t> getBuffer(){
-        return buffer;
-    } 
+  private:
+    std ::unique_ptr<uint8_t[]> buffer;
+    const char *fileName;
+    unsigned Width, Height;
+    unsigned i;
 };

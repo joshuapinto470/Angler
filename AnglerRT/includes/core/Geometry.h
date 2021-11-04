@@ -185,8 +185,8 @@ inline T Vec3<T> :: operator[](int& a) const{
 	
 	#ifndef NDEBUG
 		spdlog::warn("Vector component out of range!");
-		return 0;
 	#endif
+	return _z;
 }
 
 template <typename T>
