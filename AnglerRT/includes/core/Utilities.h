@@ -26,6 +26,7 @@ typedef Vec2<Float> Vec2f;
 typedef Vec2<double> Vec2d;
 typedef Vec2<int> Vec2i;
 typedef Vec2<int> Position2D;
+typedef Vec2<int> Point2;
 
 typedef Mat44<float> Mat44f;
 typedef Mat44<int> Mat44i;

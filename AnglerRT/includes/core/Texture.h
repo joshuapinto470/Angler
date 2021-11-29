@@ -4,13 +4,13 @@
 
 #pragma once
 
+#include "Utilities.h"
 #include <lodepng.h>
 #include <vector>
-#include "Utilities.h"
 
-struct Pixel{
+struct Pixel {
     unsigned R, G, B, A;
-    Pixel(unsigned r, unsigned g, unsigned b, unsigned a){
+    Pixel(unsigned r, unsigned g, unsigned b, unsigned a) {
         R = r;
         G = g;
         B = b;
@@ -18,22 +18,20 @@ struct Pixel{
     }
 };
 
-
 class Texture {
-public:
+  public:
     Texture() = default;
-    explicit Texture(const char*);
+    explicit Texture(const char *);
 
     Color GetPixel(int, int) const;
 
     unsigned int getWidth() const;
     unsigned int getHeight() const;
 
-private:
-    const char* mFileName{nullptr};
-    std :: vector<unsigned char> imageData;
-    std :: vector<Pixel> pixelData;
-    unsigned width{0}, height{0};
+  private:
+    const char *mFileName{ nullptr };
+    bool isValid;
+    std ::vector<unsigned char> imageData;
+    std ::vector<Pixel> pixelData;
+    unsigned width{ 0 }, height{ 0 };
 };
-
-

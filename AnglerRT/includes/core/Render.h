@@ -7,8 +7,8 @@
 #include "spdlog/spdlog.h"
 
 struct Tile {
-    Point start;
-    Point end;
+    Point2 start;
+    Point2 end;
 };
 
 class Render {
@@ -19,6 +19,7 @@ class Render {
 
   private:
     void RenderScene();
+    void InitFromOptions();
     Color Trace(const Ray &, int);
 
     std::shared_ptr<ImageBuffer> mBuffer;
@@ -36,6 +37,7 @@ class Render {
 
 class Integrator {
   public:
+    Integrator();
     Integrator(Tile);
     ~Integrator();
 

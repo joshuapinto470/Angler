@@ -1,7 +1,6 @@
 project(AnglerED)
 
 include_directories(
-        "includes"
         "includes/imgui"
         "../external_includes"
         "../AnglerRT/includes/core"
@@ -11,6 +10,7 @@ include_directories(
         "../AnglerRT/includes/image_formats"
         "../AnglerRT/includes"
 	"../tools/tinyobjloader"
+        "includes"
 )
 
 find_library(SPDLOG_LIB spdlog ../libs/spdlog)
@@ -24,6 +24,7 @@ add_subdirectory(vendor/GLFW/)
 
 add_executable(AnglerED
         src/main.cpp
+        src/scenes.cpp
         src/obj2angler.cpp
         src/glad.c
         src/imgui/imgui.cpp

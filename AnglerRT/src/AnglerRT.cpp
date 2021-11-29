@@ -9,44 +9,51 @@ Render::Render(const Scene &scene, const Camera &camera, Options &options) {
     nThreads = (nThreads == 0) ? 1 : nThreads;
     spdlog::info("Detected {} threads", nThreads);
 
-    options.isRenderActive = false;
-    options.progress = 0.0f;
-    options.image = nullptr;
+    InitFromOptions();
+}
 
-    WIDTH = options.WIDTH;
-    HEIGHT = options.HEIGHT;
-    samples_per_pixel = options.SAMPLES_PER_PIXEL;
-    max_depth = options.MAX_DEPTH;
+/*
+    Initialize the renderer with the options selected
+    by the user every time we render the scene.
+*/
+void Render::InitFromOptions() {
+    mOptions->isRenderActive = false;
+    mOptions->progress = 0.0f;
+    mOptions->image = nullptr;
+
+    WIDTH = mOptions->WIDTH;
+    HEIGHT = mOptions->HEIGHT;
+    samples_per_pixel = mOptions->SAMPLES_PER_PIXEL;
+    max_depth = mOptions->MAX_DEPTH;
 
     width_inv = (Float)1.0 / (WIDTH - 1);
     height_inv = (Float)1.0 / (HEIGHT - 1);
     samples_inv = (Float)1.0 / samples_per_pixel;
-
-    mBuffer = std::make_shared<ImageBuffer>(WIDTH, HEIGHT);
+    mBuffer = nullptr;
 }
 
 void Render::StartRender() {
-    // TODO: Implement multi-threading support here.
-    // spawn multiple RenderScene instances with their own image buffers.
-    // combine the image buffers and set the Options.image attribute to the buffer.
-
-    // TODO: Implement tile based multithreading.
-    // TODO: Implement progressive multithreading.
-
+    InitFromOptions();
     mOptions->isRenderActive = true;
+    spdlog::info("Samples per pixel : {}", samples_per_pixel);
 
     spdlog::info("Starting Render");
+    mBuffer = std::make_shared<ImageBuffer>(WIDTH, HEIGHT);
+
     RenderScene();
-    // PNG tImage(*mBuffer);
+
+    PNG tImage(*mBuffer);
     spdlog::info("Render Done!");
+
     mOptions->image = mBuffer;
     mOptions->isRenderActive = false;
 }
 
 void Render::RenderScene() {
+    float h_inv = 1.0 / HEIGHT;
 
     for (int j = HEIGHT - 1; j >= 0; --j) {
-        mOptions->progress = (float)(HEIGHT - j) * height_inv;
+        mOptions->progress = (float)(HEIGHT - j) * h_inv;
 
         for (int i = 0; i < WIDTH; ++i) {
             Color pixel_color(0, 0, 0);
@@ -63,7 +70,9 @@ void Render::RenderScene() {
             mBuffer->Write(pixel_color);
         }
     }
-    mOptions->image = mBuffer;
+}
+
+void Integrator::RenderTile() {
 }
 
 Color Render::Trace(const Ray &ray, int max_depth) {

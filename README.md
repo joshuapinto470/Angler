@@ -21,11 +21,24 @@ If the repository was cloned non-recursively previously, use `git submodule upda
 Now you should be able to build the project in CMake.
 
 ***
+
+## USEAGE AND DOCUMENTATION
+Checkout the `docs/USEAGE.md` on how to get started with Angler.  
+The `docs/ORGANIZATION.md` file contains the file structure and layout 
+of the project.
+***
 ## Dependencies
  [Imgui](https://github.com/ocornut/imgui) ( For AnglerRT GUI)   
  [GLFW](https://www.glfw.org/).  
  [Tinyobjloader](https://github.com/tinyobjloader/tinyobjloader) (To load .obj files from blender).  
- [spdlog](https://github.com/gabime/spdlog) (Logging).  
+ [spdlog](https://github.com/gabime/spdlog) (Logging).
+
+ ## Refrences
+
+ * [PBRT](https://www.pbrt.org/)  
+ * [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)  
+
+
  
 ## License
 AnglerRT and AnglerED is licensed under the MIT License, see the LICENSE file for more information.

@@ -1,147 +1,15 @@
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include <algorithm>
-#include <cstdio>
-#include <thread>
-#include <utility>
+#include "AnglerED.h"
 
-#include "glad/glad.h"
-#include <GLFW/glfw3.h>
-
-#include "AnglerRT.h"
-#include "BVH.h"
-#include "Render.h"
-
-#include "obj2angler.h"
-
-// TODO: Implement a GUI for anglerRT
-
-Scene random_scene() {
-    Scene world;
-
-    auto ground_material = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
-    world.Add(std::make_shared<Sphere>(Vec3f(0, -1000, 0), 1000, ground_material));
-
-    for (int a = -11; a < 11; a++) {
-        for (int b = -11; b < 11; b++) {
-            auto choose_mat = random_double();
-            Vec3f center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
-
-            if ((center - Vec3f(4, 0.2, 0)).Length() > 0.9) {
-                std::shared_ptr<Material> sphere_material;
-
-                if (choose_mat < 0.8) {
-                    // diffuse
-                    auto albedo = random_color() * random_color();
-                    sphere_material = std::make_shared<Lambertian>(albedo);
-                    world.Add(std::make_shared<Sphere>(center, 0.2, sphere_material));
-                } else if (choose_mat < 0.95) {
-                    // metal
-                    auto albedo = random_color();
-                    auto fuzz = random_double(0, 0.5);
-                    sphere_material = std::make_shared<Metallic>(albedo, fuzz);
-                    world.Add(std::make_shared<Sphere>(center, 0.2, sphere_material));
-                } else {
-                    // glass
-                    sphere_material = std::make_shared<Dielectric>(0.7);
-                    world.Add(std::make_shared<Sphere>(center, 0.2, sphere_material));
-                }
-            }
-        }
-    }
-
-    auto material1 = std::make_shared<Dielectric>(1.5);
-    world.Add(std::make_shared<Sphere>(Vec3f(0, 1, 0), 1.0, material1));
-
-    auto material2 = std::make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
-    world.Add(std::make_shared<Sphere>(Vec3f(-4, 1, 0), 1.0, material2));
-
-    auto material3 = std::make_shared<Metallic>(Color(0.7, 0.6, 0.5), 0.0);
-    world.Add(std::make_shared<Sphere>(Vec3f(4, 1, 0), 1.0, material3));
-
-    // return world;
-    return Scene(std::make_shared<BVH>(world, 0.0, 1.0));
-    ;
-}
-
-Scene MeshScene() {
-    Scene world;
-
-    std::vector<std::vector<std::shared_ptr<Shape>>> mesh = LoadMeshFromFile();
-
-    // std :: shared_ptr<Material> material1 = std :: make_shared<Dielectric>(1.0);
-    // std :: shared_ptr<Material> material3 = std :: make_shared<Metallic>(Color(0.8, 0.8, 0.5), 0.01);
-    // std :: shared_ptr<Material> glass_mat = std :: make_shared<Glass>(Color(1.0, 1.0, 1.0), 1.0, 1.0);
-
-    // world.Add( std :: make_shared<Sphere>(Point(0, 0, -1), 0.5, material1));
-    // world.Add( std :: make_shared<Sphere>(Point(-2, 0, -1), 0.5, glass_mat));
-    // world.Add( std :: make_shared<Sphere>(Point(2, 0, -1), 0.5, material3));
-
-    for (auto &i : mesh) {
-        for (auto &j : i)
-            world.Add(j);
-    }
-    return world;
-}
-
-Scene QuickScene() {
-    Scene world;
-
-    std ::shared_ptr<Material> material1 = std ::make_shared<Dielectric>(1.0);
-    std ::shared_ptr<Material> material3 = std ::make_shared<Metallic>(Color(0.8, 0.8, 0.5), 0.01);
-    std ::shared_ptr<Material> glass_mat = std ::make_shared<Glass>(Color(1.0, 1.0, 1.0), 1.0, 1.0);
-
-    world.Add(std ::make_shared<Sphere>(Point(0, 0, -1), 0.5, material1));
-    world.Add(std ::make_shared<Sphere>(Point(-2, 0, -1), 0.5, glass_mat));
-    world.Add(std ::make_shared<Sphere>(Point(2, 0, -1), 0.5, material3));
-
-    return world;
-}
-
-bool BindImageTexture(unsigned char *buffer, GLuint *out_texture, int image_width, int image_height) {
-
-    // Load from buffer
-    unsigned char *image_data = buffer;
-    if (image_data == nullptr)
-        return false;
-
-    // Create a OpenGL texture identifier
-    GLuint image_texture;
-    glGenTextures(1, &image_texture);
-    glBindTexture(GL_TEXTURE_2D, image_texture);
-
-    // Setup filtering parameters for display
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                    GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
-
-    // Upload pixels into texture
-#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-#endif
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-
-    *out_texture = image_texture;
-
-    return true;
-}
+bool BindImageTexture(unsigned char *, GLuint *, int, int);
 
 int main() {
-
-#ifndef NDEBUG
-    spdlog::info("DEBUG BUILD");
-    spdlog::info(__TIMESTAMP__);
-#endif
 
     spdlog::info("CPU Arch : {} bit", sizeof(void *) * 8);
 
     // AnglerRT initialization.
     float aspect_ratio = 16.0 / 9.0;
 
-    Options options{};
+    Options options;
     options.MAX_DEPTH = 4;
     options.SAMPLES_PER_PIXEL = 60;
     options.WIDTH = 512;
@@ -155,16 +23,13 @@ int main() {
 
     Scene world = random_scene();
 
-    std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(
-        "D:/Documents/C++/Angler/Angler_ED_RT/Angler/Textures/UV_Debug.png");
-    world.SetEnvironmentTexture(envTex);
+    const char *TextureFilePath = "D:/Documents/C++/Angler/Angler_ED_RT/Angler/Textures/UV_Debug.png";
 
-    // when isRenderActive is set to true the renderer is active.
-    // Dont start another render process until the current one is finished or stopped.
+    std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(TextureFilePath);
+    world.SetEnvironmentTexture(envTex);
     options.isRenderActive = false;
 
-    // RenderScene(world, camera, options);
-
+    Render renderer(world, camera, options);
     GLFWwindow *window;
 
     const char *glsl_version = "#version 130";
@@ -209,8 +74,6 @@ int main() {
 
     GLuint renderedImageTexture = 0;
 
-    Render renderer(world, camera, options);
-
     // Loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -225,8 +88,8 @@ int main() {
 
         // Dont modify renderer setting while the renderer is active.
         if (!options.isRenderActive) {
-            ImGui::Begin("Renderer settings");
-            ImGui::Text("AnglerRT Settings");
+            ImGui::Begin("AnglerRT settings");
+            ImGui::Text("Renderer Settings");
             ImGui::InputInt("Max Depth", &options.MAX_DEPTH);
             ImGui::InputInt("Samples", &options.SAMPLES_PER_PIXEL);
             ImGui::InputFloat("Aspect Ratio ", &aspect_ratio);
@@ -280,13 +143,14 @@ int main() {
 
                 std::shared_ptr<uint8_t[]> mBuffer = options.image->getBufferCopy();
                 unsigned char *buffer = new unsigned char[options.WIDTH * options.HEIGHT * 4];
-                for(int i = 0; i < options.WIDTH * options.HEIGHT * 4; i++){
-                    buffer[i] = 150;
+                for (int i = 0; i < options.WIDTH * options.HEIGHT * 4; i++) {
+                    buffer[i] = mBuffer[i];
                 }
 
                 if (!BindImageTexture(buffer, &renderedImageTexture, options.WIDTH, options.HEIGHT))
                     spdlog::warn("AnglerED : Binding texture failed");
                 needToBindTexture = false;
+                delete[] buffer;
             }
 
             ImGui::Begin("Rendered Image");
@@ -299,7 +163,9 @@ int main() {
         ImGui::Render();
 
         // Render here
-        glClearColor(0.12f, 0.14f, 0.17f, 1.0f);
+        // glClearColor(0.12f, 0.14f, 0.17f, 1.0f);
+        glClearColor(0.117f, 0.117f, 0.117f, 1.0f);
+
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         // Swap front and back buffers
@@ -312,4 +178,34 @@ int main() {
 
     glfwTerminate();
     return 0;
+}
+
+bool BindImageTexture(unsigned char *buffer, GLuint *out_texture, int image_width, int image_height) {
+
+    // Load from buffer
+    unsigned char *image_data = buffer;
+    if (image_data == nullptr)
+        return false;
+
+    // Create a OpenGL texture identifier
+    GLuint image_texture;
+    glGenTextures(1, &image_texture);
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+
+    // Setup filtering parameters for display
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                    GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
+
+    // Upload pixels into texture
+#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+
+    *out_texture = image_texture;
+
+    return true;
 }
