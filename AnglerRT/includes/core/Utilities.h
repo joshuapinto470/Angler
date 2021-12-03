@@ -34,6 +34,8 @@ typedef Mat44<int> Mat44i;
 // Constants
 const double Infinity = std ::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
+const double PI_INV = 1 / PI;
+const float INV_255 = 1 / 255.0;
 
 // Helper functions
 

@@ -31,6 +31,12 @@ class Render {
     int samples_per_pixel, max_depth;
 
     Float width_inv, height_inv, samples_inv;
+    int rayCasts;
+    int envRays;
+
+    Ray outRay;
+    Color mColor;
+    Interaction inter;
 
     Options *mOptions;
 };

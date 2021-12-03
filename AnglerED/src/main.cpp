@@ -26,7 +26,7 @@ int main() {
     const char *TextureFilePath = "D:/Documents/C++/Angler/Angler_ED_RT/Angler/Textures/UV_Debug.png";
 
     std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(TextureFilePath);
-    world.SetEnvironmentTexture(envTex);
+    world.SetEnvironmentTexture(nullptr);
     options.isRenderActive = false;
 
     Render renderer(world, camera, options);

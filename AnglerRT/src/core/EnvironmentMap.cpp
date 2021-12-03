@@ -4,10 +4,10 @@
 
 #include "EnvironmentMap.h"
 
-Color EnvironmentTexture :: MapTexture(Float x, Float y, Float z) const{
+Color EnvironmentTexture ::MapTexture(Float x, Float y, Float z) const {
     // u-v map the 3-d points into the 2d image texture;
-    Float u = 0.5 + (atan2(z, x) / (2 * PI));
-    Float v = 0.5 - asin(y) / PI;
+    Float u = 0.5 + (atan2(z, x) * 0.5 * PI_INV);
+    Float v = 0.5 - asin(y) * PI_INV;
 
     u *= getWidth();
     v *= getHeight();
@@ -15,7 +15,7 @@ Color EnvironmentTexture :: MapTexture(Float x, Float y, Float z) const{
     return GetPixel(v, u);
 }
 
-Color EnvironmentTexture :: MapTexture(const Ray &ray) const{
+Color EnvironmentTexture ::MapTexture(const Ray &ray) const {
     Vec3f dir = ray.Direction().Normalize();
     return MapTexture(dir.x(), dir.y(), dir.z());
 }

@@ -9,8 +9,8 @@
 #include <vector>
 
 struct Pixel {
-    unsigned R, G, B, A;
-    Pixel(unsigned r, unsigned g, unsigned b, unsigned a) {
+    float R, G, B, A;
+    Pixel(float r, float g, float b, float a) {
         R = r;
         G = g;
         B = b;

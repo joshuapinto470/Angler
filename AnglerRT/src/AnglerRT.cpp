@@ -1,4 +1,5 @@
 #include "Render.h"
+#include <chrono>
 
 Render::Render(const Scene &scene, const Camera &camera, Options &options) {
     mScene = std::make_shared<Scene>(scene);
@@ -30,22 +31,45 @@ void Render::InitFromOptions() {
     height_inv = (Float)1.0 / (HEIGHT - 1);
     samples_inv = (Float)1.0 / samples_per_pixel;
     mBuffer = nullptr;
+
+    rayCasts = 0;
+    envRays = 0;
 }
 
 void Render::StartRender() {
+    std ::chrono ::time_point<std::chrono::high_resolution_clock> wallStart, wallEnd;
+    std ::chrono ::time_point<std::chrono::high_resolution_clock> renderStart, renderEnd;
+    spdlog::info("Samples per pixel : {}", samples_per_pixel);
+    spdlog::info("Starting Render");
+
+    wallStart = std::chrono::high_resolution_clock::now();
+
     InitFromOptions();
     mOptions->isRenderActive = true;
-    spdlog::info("Samples per pixel : {}", samples_per_pixel);
 
-    spdlog::info("Starting Render");
     mBuffer = std::make_shared<ImageBuffer>(WIDTH, HEIGHT);
 
+    renderStart = std::chrono::high_resolution_clock::now();
     RenderScene();
+    renderEnd = std::chrono::high_resolution_clock::now();
 
     PNG tImage(*mBuffer);
-    spdlog::info("Render Done!");
 
     mOptions->image = mBuffer;
+
+    wallEnd = std::chrono::high_resolution_clock::now();
+    spdlog::info("Render Done!");
+
+    std::chrono::duration<double> elapsedRender = renderEnd - renderStart;
+    std::chrono::duration<double> elapsedWall = wallEnd - wallStart;
+
+    spdlog::info("Total ray casts : {} rays", rayCasts);
+    spdlog::info("Total environment rays : {} rays", envRays);
+    spdlog::info("Percent of environment rays : {} %", ((float)envRays / rayCasts) * 100.0f);
+    spdlog::info("Render Time : {} seconds", elapsedRender.count());
+    spdlog::info("Wall Time : {} seconds", elapsedWall.count());
+    spdlog::info("Render to Wall delta : {} ", elapsedWall.count() - elapsedRender.count());
+
     mOptions->isRenderActive = false;
 }
 
@@ -79,15 +103,18 @@ Color Render::Trace(const Ray &ray, int max_depth) {
     if (max_depth < 1)
         return { 0, 0, 0 };
 
-    Interaction inter;
+    rayCasts++;
+
+    // Interaction inter;
 
     if (mScene->Hit(ray, 0.001, Infinity, inter)) {
-        Ray outRay;
-        Color mColor;
+        // Ray outRay;
+        // Color mColor;
         if (inter.material->BSDF(ray, mColor, inter, outRay)) {
             return (mColor * Trace(outRay, max_depth - 1));
         }
         return mColor;
     }
+    envRays++;
     return mScene->GetEnvironmentTexture(ray);
 }

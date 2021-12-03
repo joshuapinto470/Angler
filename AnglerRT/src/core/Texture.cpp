@@ -14,10 +14,10 @@ Texture ::Texture(const char *fileName) : mFileName(fileName) {
 
     pixelData.reserve(width * height);
     for (int i = 0; i < imageData.size(); i = i + 4) {
-        unsigned r = imageData[i];
-        unsigned g = imageData[i + 1];
-        unsigned b = imageData[i + 2];
-        unsigned a = imageData[i + 3];
+        float r = imageData[i] * INV_255;
+        float g = imageData[i + 1] * INV_255;
+        float b = imageData[i + 2] * INV_255;
+        float a = imageData[i + 3];
         Pixel pxl(r, g, b, a);
         pixelData.push_back(pxl);
     }
@@ -35,7 +35,7 @@ Color Texture::GetPixel(int x, int y) const {
         return { 0, 0, 0 };
     }
     Pixel pxl = pixelData[index];
-    return { pxl.R / 255.0f, pxl.G / 255.0f, pxl.B / 255.0f };
+    return { pxl.R, pxl.G, pxl.B };
 }
 
 unsigned int Texture::getWidth() const {
