@@ -5,7 +5,7 @@
 #include "Shape.h"
 
 /*
-   
+
   A->   /\
        /  \
       /    \
@@ -20,30 +20,27 @@ where A is the top vertex.
       C is the bottom right vertex.
 */
 
-struct TriangleMesh{
-        int nTriangles;
-        std::unique_ptr<Vec3f[]> vertices;
-        std::unique_ptr<Vec3f[]> normals;
+struct TriangleMesh {
+    int nTriangles;
+    std::unique_ptr<Vec3f[]> vertices;
+    std::unique_ptr<Vec3f[]> normals;
 
-        std::vector<int> vertexIndices;
-        //TriangleMesh(std::vector<Vec3f>, std::vector<Vec3f>, int*, int);
+    std::vector<int> vertexIndices;
+    // TriangleMesh(std::vector<Vec3f>, std::vector<Vec3f>, int*, int);
 };
 
-class Triangle : public Shape{
-    private:
-        Point A, B, C;
-        std :: shared_ptr<Material> material;
-    public:
-        Triangle() = default;
-        Triangle(Point Top, Point Left, Point Right, std :: shared_ptr<Material> mat) : 
-        A(Top),
-        B(Left),
-        C(Right),
-        material(mat)
-        {};
+class Triangle : public Shape {
+  private:
+    Point A, B, C;
+    std ::shared_ptr<Material> material;
 
-        bool Hit(const Ray&, Float, Float, Interaction&) const override;
-        bool Bound(Float time0, double time1, Bounds3& output_box) const override;
+  public:
+    Triangle() = default;
+    Triangle(Point Top, Point Left, Point Right, std ::shared_ptr<Material> mat)
+        : A(Top), B(Left), C(Right), material(mat){};
+
+    bool Hit(const Ray &, Float, Float, Interaction &) const override;
+    bool Bound(Float time0, double time1, Bounds3 &output_box) const override;
 };
 
 // std::vector<std::shared_ptr<Shape>> CreateTriangleMesh(float* v, float* n, int* vi, int nTriangles){
@@ -56,4 +53,4 @@ class Triangle : public Shape{
 //         tris.push_back(std::make_shared<Triangle>());
 //     }
 
-// } 
+// }

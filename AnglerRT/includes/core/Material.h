@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Utilities.h"
+#include "Random.h"
 #include "Ray.h"
 #include "Shape.h"
-#include "Random.h"
+#include "Utilities.h"
 
-class Material{
-    public:
-        virtual bool BSDF(const Ray&, Color&, Interaction&, Ray&) const = 0;
+class Material {
+  public:
+    virtual bool BSDF(const Ray &, Color &, Interaction &, Ray &) const = 0;
 };

@@ -3,8 +3,7 @@
 //
 #include "Camera.h"
 
-Camera::Camera(double vFov, double aspect_ratio, Point lookFrom, Point lookAt, Vec3f vUp)
-{
+Camera::Camera(double vFov, double aspect_ratio, Point lookFrom, Point lookAt, Vec3f vUp) {
     Vec3f w = (lookFrom - lookAt).Normalize();
     Vec3f u = vUp.cross(w).Normalize();
     Vec3f v = w.cross(u);
@@ -24,7 +23,6 @@ Camera::Camera(double vFov, double aspect_ratio, Point lookFrom, Point lookAt, V
     lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - w;
 }
 
-Ray Camera :: get_ray(Float s, Float t) const 
-{
-    return {origin, (Vec3d)lowerLeftCorner + s * horizontal + t * vertical - origin};
+Ray Camera ::get_ray(Float s, Float t) const {
+    return { origin, (Vec3d)lowerLeftCorner + s * horizontal + t * vertical - origin };
 }

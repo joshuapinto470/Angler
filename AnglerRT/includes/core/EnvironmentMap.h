@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include "Texture.h"
 #include "Ray.h"
+#include "Texture.h"
 
-class EnvironmentTexture : public Texture{
-public:
+class EnvironmentTexture : public Texture {
+  public:
     EnvironmentTexture() = default;
-    explicit EnvironmentTexture(const char* fileName) : Texture(fileName) {};
+    explicit EnvironmentTexture(const char *fileName) : Texture(fileName){};
 
     Color MapTexture(Float x, Float y, Float z) const;
-    Color MapTexture(const Ray&) const;
+    Color MapTexture(const Ray &) const;
 };

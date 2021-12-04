@@ -45,7 +45,6 @@ Scene random_scene() {
 
     // return world;
     return Scene(std::make_shared<BVH>(world, 0.0, 1.0));
-    ;
 }
 
 Scene MeshScene() {

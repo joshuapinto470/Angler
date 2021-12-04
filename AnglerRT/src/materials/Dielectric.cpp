@@ -1,13 +1,10 @@
 #include "Dielectric.h"
 
-
-Dielectric::Dielectric(Float ior):
-IOR(ior)
-{
+Dielectric::Dielectric(Float ior) : IOR(ior) {
 }
 
-bool Dielectric::BSDF(const Ray &ray_in, Color &attenuation , Interaction &interaction, Ray &ray_out) const {
-    
+bool Dielectric::BSDF(const Ray &ray_in, Color &attenuation, Interaction &interaction, Ray &ray_out) const {
+
     attenuation = Color(1.0, 1.0, 1.0);
     Float refraction_ratio = interaction.front_face ? (1.0 / IOR) : IOR;
 
