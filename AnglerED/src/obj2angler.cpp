@@ -32,29 +32,29 @@ std::vector<std::vector<std::shared_ptr<Shape>>> LoadMeshFromFile(){
     std :: cout << "Shape size : " << shapes.size() << "\n";
     //meshes.reserve(shapes.size());
 
-    for (size_t s = 0; s < shapes.size(); s++) {
+    for (const auto & shape : shapes) {
 
         size_t index_offset = 0;
 
         // Loop over faces(polygon)
         std::vector<std::shared_ptr<Shape>> Triangles;
         
-        for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-            size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
+        for (size_t f = 0; f < shape.mesh.num_face_vertices.size(); f++) {
+            auto fv = size_t(shape.mesh.num_face_vertices[f]);
 
-            Point tVetrices[3];
+            Point tVertices[3];
             Point tNormals[3];
 
             // Loop over vertices in the face.
             for (size_t v = 0; v < fv; v++) {
 
                 // access to vertex
-                tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+                tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
                 tinyobj::real_t vx = attrib.vertices[3 * size_t(idx.vertex_index) +0];
                 tinyobj::real_t vy = attrib.vertices[3 * size_t(idx.vertex_index) +1];
                 tinyobj::real_t vz = attrib.vertices[3 * size_t(idx.vertex_index) +2];
                 //vertices.push_back(Vec3f(vx, vy, vz));
-                tVetrices[v] = Point(vx, vy, vz);
+                tVertices[v] = Point(vx, vy, vz);
 
                 // Check if `normal_index` is zero or positive. negative = no normal data
                 if (idx.normal_index >= 0) {
@@ -69,7 +69,7 @@ std::vector<std::vector<std::shared_ptr<Shape>>> LoadMeshFromFile(){
             }
 
             auto mat = std::make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
-            Triangles.push_back(std::make_shared<Triangle>(tVetrices[0], tVetrices[1], tVetrices[2], mat));
+            Triangles.push_back(std::make_shared<Triangle>(tVertices[0], tVertices[1], tVertices[2], mat));
             index_offset += fv;
         }
         meshes.push_back(Triangles);

@@ -13,16 +13,16 @@ include_directories(
         "includes"
 )
 
+
 find_library(SPDLOG_LIB spdlog ../libs/spdlog)
 
-SET(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+if(WIN32)
+        SET(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+        add_subdirectory(vendor/GLFW/)
 
-add_subdirectory(vendor/GLFW/)
-
-
-add_executable(AnglerED
+        add_executable(AnglerED
         src/main.cpp
         src/scenes.cpp
         src/obj2angler.cpp
@@ -34,12 +34,15 @@ add_executable(AnglerED
         src/imgui/imgui_impl_glfw.cpp
         src/imgui/imgui_impl_opengl3.cpp
         )
-
-#target_link_libraries(AnglerED PRIVATE AnglerRT ${SPDLOG_LIB} glfw opengl32)
-if(WIN32)
-target_link_libraries(AnglerED PRIVATE AnglerRT spdlog glfw opengl32)
+        target_link_libraries(AnglerED PRIVATE AnglerRT spdlog glfw opengl32)
 endif(WIN32)
 
+
 if(UNIX)
-target_link_libraries(AnglerED PRIVATE AnglerRT spdlog glfw)
+        add_executable(AnglerED
+        src/main.cpp
+        src/scenes.cpp
+        src/obj2angler.cpp
+        )
+        target_link_libraries(AnglerED PRIVATE AnglerRT spdlog)
 endif(UNIX)

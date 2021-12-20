@@ -1,52 +1,55 @@
 #include "AnglerED.h"
 
-bool BindImageTexture(unsigned char *, GLuint *, int, int);
-
-int main() {
-
-    spdlog::info("CPU Arch : {} bit", sizeof(void *) * 8);
-
-    // AnglerRT initialization.
-    float aspect_ratio = 16.0 / 9.0;
-
-    Options options;
-    options.MAX_DEPTH = 4;
-    options.SAMPLES_PER_PIXEL = 60;
-    options.WIDTH = 512;
-    options.HEIGHT = static_cast<int>(options.WIDTH / aspect_ratio);
-    options.image = nullptr;
-
-    int cameraFOV = 35.0;
-
-    // Camera camera(cameraFOV, aspect_ratio, Point(14, 2, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
-    Camera camera(cameraFOV, aspect_ratio, Point(0, 3, 10), Point(0, 0, 0), Vec3f(0, 1, 0));
-
-    Scene world = random_scene();
-
-    const char *TextureFilePath = "D:/Documents/C++/Angler/Angler_ED_RT/Angler/Textures/UV_Debug.png";
-
-    std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(TextureFilePath);
-    world.SetEnvironmentTexture(nullptr);
-    options.isRenderActive = false;
-
-    Render renderer(world, camera, options);
+enum MODE { NOGUI, GUI };
+class AnglerED {
+  private:
+    // Display settings
     GLFWwindow *window;
+    uint16_t HEIGHT, WIDTH;
+    // Renderer settings
+    Render *mRenderer;
+    Camera &mCamera;
+    Options &options;
+    ImGuiIO &io;
+    int cameraFOV;
+    float aspect_ratio;
+    // ImGUI
+
+    void Init();
+
+  public:
+    AnglerED(uint16_t, uint16_t, Render *, Camera &, Options &);
+    ~AnglerED();
+
+    void Loop();
+};
+
+AnglerED ::AnglerED(uint16_t Width, uint16_t Height, Render *Renderer, Camera &camera, Options &opt)
+    : io(ImGui::GetIO()), mCamera(camera), options(opt) {
+    WIDTH = Width;
+    HEIGHT = Height;
+
+    mRenderer = Renderer;
+    mCamera = camera;
+
+    cameraFOV = 35.0f;
+    aspect_ratio = 16.0f / 9.0f;
 
     const char *glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    // Initialize the library
-    if (!glfwInit())
-        return -1;
-
-    int display_width = 1280, display_height = 720;
+    if (!glfwInit()) {
+        spdlog::error("OpenGL Error! (GLFW INIT FAILED!)");
+        return;
+    }
 
     // Create a windowed mode window and its OpenGL context
-    window = glfwCreateWindow(display_width, display_height, "AnglerED", nullptr, nullptr);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "AnglerED", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
-        return -1;
+        spdlog::error("OpenGL Error! (WINDOW CREATION FAILED!)");
+        return;
     }
 
     // Make the window's context current
@@ -56,25 +59,36 @@ int main() {
     bool err = gladLoadGL() == 0;
     if (err) {
         spdlog::error("OpenGL Error!");
-        return 1;
+        return;
     }
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
+
     (void)io;
 
     ImGui::StyleColorsDark();
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+}
+
+AnglerED ::~AnglerED() {
+    delete mRenderer;
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwTerminate();
+}
+
+void AnglerED ::Loop() {
 
     bool show_demo_window = true;
     bool needToBindTexture = false;
 
     GLuint renderedImageTexture = 0;
 
-    // Loop until the user closes the window
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
@@ -102,7 +116,7 @@ int main() {
             static float p[4] = { 0.f, 3.f, 10.f, 0.44f };
             static float q[4] = { 0.0f, 0.0f, 0.0f, 0.44f };
             if (ImGui::InputFloat3("Look From", p) || ImGui::InputFloat3("Look At", q))
-                camera =
+                mCamera =
                     Camera(cameraFOV, aspect_ratio, Point(p[0], p[1], p[2]), Point(q[0], q[1], q[2]), Vec3f(0, 1, 0));
             ImGui::End();
         }
@@ -125,7 +139,7 @@ int main() {
             if (ImGui::Button("Render Image") && !options.isRenderActive) {
                 options.image = nullptr;
 
-                std::thread render(&Render::StartRender, renderer);
+                std::thread render(&Render::StartRender, *mRenderer);
                 render.detach();
 
                 // renderer.StartRender();
@@ -142,7 +156,7 @@ int main() {
                 // options.image->GammaCorrect();
 
                 std::shared_ptr<uint8_t[]> mBuffer = options.image->getBufferCopy();
-                unsigned char *buffer = new unsigned char[options.WIDTH * options.HEIGHT * 4];
+                auto *buffer = new unsigned char[options.WIDTH * options.HEIGHT * 4];
                 for (int i = 0; i < options.WIDTH * options.HEIGHT * 4; i++) {
                     buffer[i] = mBuffer[i];
                 }
@@ -154,8 +168,8 @@ int main() {
             }
 
             ImGui::Begin("Rendered Image");
-            ImGui::Text("Image Size = %d x %d", std::min(options.WIDTH, display_width - 100),
-                        std::min(options.HEIGHT, display_height - 100));
+            ImGui::Text("Image Size = %d x %d", std::min(options.WIDTH, WIDTH - 100),
+                        std::min(options.HEIGHT, HEIGHT - 100));
 
             ImGui::Image((void *)(intptr_t)renderedImageTexture, ImVec2(options.WIDTH, options.HEIGHT));
             ImGui::End();
@@ -171,15 +185,50 @@ int main() {
         // Swap front and back buffers
         glfwSwapBuffers(window);
     }
+}
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+int main(int argc, char *argv[]) {
 
-    glfwTerminate();
+    spdlog::info("CPU Arch : {} bit", sizeof(void *) * 8);
+
+    // AnglerRT initialization.
+    float aspect_ratio = 16.0 / 9.0;
+
+    Options options;
+    options.MAX_DEPTH = 4;
+    options.SAMPLES_PER_PIXEL = 60;
+    options.WIDTH = 512;
+    options.HEIGHT = static_cast<int>(options.WIDTH / aspect_ratio);
+    options.image = nullptr;
+
+    int cameraFOV = 35;
+
+    // Camera camera(cameraFOV, aspect_ratio, Point(14, 2, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
+    Camera camera = Camera(cameraFOV, aspect_ratio, Point(0, 3, 10), Point(0, 0, 0), Vec3f(0, 1, 0));
+
+    Scene world = random_scene();
+
+    const char *TextureFilePath = "D:/Documents/C++/Angler/Angler_ED_RT/Angler/Textures/UV_Debug.png";
+
+    std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(TextureFilePath);
+    world.SetEnvironmentTexture(nullptr);
+    options.isRenderActive = false;
+
+    Render *renderer = new Render(world, camera, options);
+
+#ifdef __WIN32
+    AnglerED anglerED(500, 400, renderer, camera, options);
+    anglerED.Loop();
+#endif
+
+#ifdef __unix__
+    renderer->StartRender();
+#endif
+
     return 0;
 }
 
+#ifdef __WIN32
 bool BindImageTexture(unsigned char *buffer, GLuint *out_texture, int image_width, int image_height) {
 
     // Load from buffer
@@ -209,3 +258,5 @@ bool BindImageTexture(unsigned char *buffer, GLuint *out_texture, int image_widt
 
     return true;
 }
+
+#endif

@@ -25,13 +25,16 @@
 
 struct Options {
     Options() = default;
+    Options(int width, int height, int samples, int depth) : WIDTH(width),
+          HEIGHT(height), SAMPLES_PER_PIXEL(samples), MAX_DEPTH(depth) {};
 
     int WIDTH, HEIGHT;
     int SAMPLES_PER_PIXEL;
     int MAX_DEPTH;
     // stats
-    float progress;
-    bool isRenderActive;
+    float progress = .0f;
+    bool isRenderActive = false;
+    bool stopRender = false;
 
     std::shared_ptr<Image> image;
 };

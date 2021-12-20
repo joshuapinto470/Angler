@@ -1,12 +1,13 @@
 #include "Render.h"
 #include <chrono>
+#include <utility>
 
 Render::Render(const Scene &scene, const Camera &camera, Options &options) {
     mScene = std::make_shared<Scene>(scene);
     mCamera = std::make_shared<Camera>(camera);
     mOptions = &options;
 
-    auto nThreads = std::thread::hardware_concurrency();
+    nThreads = std::thread::hardware_concurrency();
     nThreads = (nThreads == 0) ? 1 : nThreads;
     spdlog::info("Detected {} threads", nThreads);
 
@@ -24,12 +25,12 @@ void Render::InitFromOptions() {
 
     WIDTH = mOptions->WIDTH;
     HEIGHT = mOptions->HEIGHT;
-    samples_per_pixel = mOptions->SAMPLES_PER_PIXEL;
-    max_depth = mOptions->MAX_DEPTH;
+    SamplesPerPixel = mOptions->SAMPLES_PER_PIXEL;
+    MaxDepth = mOptions->MAX_DEPTH;
 
     width_inv = (Float)1.0 / (WIDTH - 1);
     height_inv = (Float)1.0 / (HEIGHT - 1);
-    samples_inv = (Float)1.0 / samples_per_pixel;
+    samples_inv = (Float)1.0 / SamplesPerPixel;
     mBuffer = nullptr;
 
     rayCasts = 0;
@@ -39,7 +40,7 @@ void Render::InitFromOptions() {
 void Render::StartRender() {
     std ::chrono ::time_point<std::chrono::high_resolution_clock> wallStart, wallEnd;
     std ::chrono ::time_point<std::chrono::high_resolution_clock> renderStart, renderEnd;
-    spdlog::info("Samples per pixel : {}", samples_per_pixel);
+    spdlog::info("Samples per pixel : {}", SamplesPerPixel);
     spdlog::info("Starting Render");
 
     wallStart = std::chrono::high_resolution_clock::now();
@@ -68,26 +69,26 @@ void Render::StartRender() {
     spdlog::info("Percent of environment rays : {} %", ((float)envRays / rayCasts) * 100.0f);
     spdlog::info("Render Time : {} seconds", elapsedRender.count());
     spdlog::info("Wall Time : {} seconds", elapsedWall.count());
-    spdlog::info("Render to Wall delta : {} ", elapsedWall.count() - elapsedRender.count());
+    spdlog::info("R2Wt : {} ", elapsedWall.count() - elapsedRender.count());
 
     mOptions->isRenderActive = false;
 }
 
 void Render::RenderScene() {
-    float h_inv = 1.0 / HEIGHT;
+    float h_inv = 1.0f / static_cast<float>(HEIGHT);
 
-    for (int j = HEIGHT - 1; j >= 0; --j) {
+    for (int j = HEIGHT - 1; j >= 0 && !mOptions->stopRender; --j) {
         mOptions->progress = (float)(HEIGHT - j) * h_inv;
 
         for (int i = 0; i < WIDTH; ++i) {
             Color pixel_color(0, 0, 0);
 
-            for (int s = 0; s < samples_per_pixel; ++s) {
+            for (int s = 0; s < SamplesPerPixel; ++s) {
                 Float u = (i + random_double()) * width_inv;
                 Float v = (j + random_double()) * height_inv;
 
                 Ray ray = mCamera->get_ray(u, v);
-                pixel_color = pixel_color + Trace(ray, max_depth);
+                pixel_color = pixel_color + Trace(ray, MaxDepth);
             }
 
             pixel_color = pixel_color * samples_inv;
@@ -96,20 +97,13 @@ void Render::RenderScene() {
     }
 }
 
-void Integrator::RenderTile() {
-}
-
 Color Render::Trace(const Ray &ray, int max_depth) {
     if (max_depth < 1)
         return { 0, 0, 0 };
 
     rayCasts++;
 
-    // Interaction inter;
-
     if (mScene->Hit(ray, 0.001, Infinity, inter)) {
-        // Ray outRay;
-        // Color mColor;
         if (inter.material->BSDF(ray, mColor, inter, outRay)) {
             return (mColor * Trace(outRay, max_depth - 1));
         }
