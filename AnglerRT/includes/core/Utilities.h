@@ -60,12 +60,12 @@ template <typename T> inline bool NearZero(const Vec3<T> &v) {
 }
 
 inline Vec3f refract(const Vec3f &vector, const Vec3f &normal, double angleOfRefraction) {
-    Float cos_theta = fmin(-vector.dot(normal), 1.0);
-    Vec3f r_out_perp = angleOfRefraction * (-vector + cos_theta * normal);
+    Float cos_theta = fmin((-vector).dot(normal), 1.0);
+    Vec3f r_out_perp = angleOfRefraction * (vector + cos_theta * normal);
     Vec3f r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.LengthSquared())) * normal;
     return r_out_perp + r_out_parallel;
 }
 
 template <typename T> inline Vec3<T> reflect(const Vec3<T> &v, const Vec3<T> &n) {
-    return v - 2 * v.dot(n) * n;
+    return v - 2 * (v.dot(n)) * n;
 }

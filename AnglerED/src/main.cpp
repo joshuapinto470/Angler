@@ -1,11 +1,14 @@
 #include "AnglerED.h"
 
-enum MODE { NOGUI, GUI };
+enum GUI_MODE { NOGUI, GUI };
 class AnglerED {
   private:
     // Display settings
     GLFWwindow *window;
+    GLuint renderedImageTexture = 0;
     uint16_t HEIGHT, WIDTH;
+    bool needToBindTexture;
+
     // Renderer settings
     Render *mRenderer;
     Camera &mCamera;
@@ -16,6 +19,10 @@ class AnglerED {
     // ImGUI
 
     void Init();
+    void DrawRenderWindow();
+    void DrawSceneMenu();
+    void DrawSettingsMenu();
+    void DrawRenderButton();
 
   public:
     AnglerED(uint16_t, uint16_t, Render *, Camera &, Options &);
@@ -34,6 +41,8 @@ AnglerED ::AnglerED(uint16_t Width, uint16_t Height, Render *Renderer, Camera &c
 
     cameraFOV = 35.0f;
     aspect_ratio = 16.0f / 9.0f;
+
+    needToBindTexture = false;
 
     const char *glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -82,12 +91,93 @@ AnglerED ::~AnglerED() {
     glfwTerminate();
 }
 
+void AnglerED ::DrawSettingsMenu() {
+    // The settings for the renderer.
+    // This is disabled when the renderer is active
+    ImGui::Begin("AnglerRT settings");
+    if (!options.isRenderActive) {
+        ImGui::Text("Renderer Settings");
+        ImGui::InputInt("Max Depth", &options.MAX_DEPTH);
+        ImGui::InputInt("Samples", &options.SAMPLES_PER_PIXEL);
+        ImGui::InputFloat("Aspect Ratio ", &aspect_ratio);
+        ImGui::InputInt("Image Width", &options.WIDTH);
+        options.HEIGHT = static_cast<int>(options.WIDTH / aspect_ratio);
+        ImGui::Text("Resolution (%d X %d)", options.WIDTH, options.HEIGHT);
+        ImGui::Separator();
+        ImGui::Text("Camera Settings");
+        ImGui::InputInt("Camera FOV", &cameraFOV);
+        static float p[4] = { 0.f, 3.f, 10.f, 0.44f };
+        static float q[4] = { 0.0f, 0.0f, 0.0f, 0.44f };
+        if (ImGui::InputFloat3("Look From", p) || ImGui::InputFloat3("Look At", q))
+            mCamera = Camera(cameraFOV, aspect_ratio, Point(p[0], p[1], p[2]), Point(q[0], q[1], q[2]), Vec3f(0, 1, 0));
+    } else {
+        ImGui::Text("Render is in progress.");
+    }
+    ImGui::End();
+}
+
+void AnglerED ::DrawRenderButton() {
+    // Spawn a render thread when the button is pressed.
+    // If the renderer is active then display the progress of the renderer.
+    ImGui::Begin("AnglerRT");
+    ImGui::Text("Render Window");
+
+    if (ImGui::Button("Render Image") && !options.isRenderActive) {
+        options.image = nullptr;
+
+        std::thread render(&Render::StartRender, *mRenderer);
+        render.detach();
+
+        // renderer.StartRender();
+        needToBindTexture = true;
+    } else {
+        ImGui::Text("Progress : %.2f %%", options.progress * 100);
+    }
+    ImGui::End();
+}
+
+void AnglerED ::DrawSceneMenu() {
+    ImGui::Begin("Scene Settings");
+    ImGui::Text("Resolution (%d X %d)", options.WIDTH, options.HEIGHT);
+    ImGui::Text("Max Depth: %d", options.MAX_DEPTH);
+    ImGui::Text("Samples: %d", options.SAMPLES_PER_PIXEL);
+    ImGui::Text("Aspect Ratio: %.2f", aspect_ratio);
+    ImGui::Separator();
+    ImGui::Text("Camera FOV: %d", cameraFOV);
+    ImGui::End();
+}
+
+void AnglerED ::DrawRenderWindow() {
+    // Check if the renderer is inactive and there is
+    // an image to display
+    if (!options.isRenderActive && options.image) {
+        // Check if need to bind the texture to OpenGL.
+        // This is done once when we get a new image from the renderer.
+        if (needToBindTexture) {
+            // Bind the texture to OpenGL.
+            spdlog::info("AnglerED : Binding texture data");
+
+            std::shared_ptr<uint8_t[]> mBuffer = options.image->getBufferCopy();
+            int BufferSize = options.HEIGHT * options.WIDTH * 4;
+            auto *buffer = new unsigned char[BufferSize];
+            memcpy(buffer, mBuffer.get(), BufferSize);
+
+            if (!BindImageTexture(buffer, &renderedImageTexture, options.WIDTH, options.HEIGHT))
+                spdlog::warn("AnglerED : Binding texture failed");
+            needToBindTexture = false;
+            delete[] buffer;
+        }
+
+        // Display the rendered image
+        ImGui::Begin("Rendered Image");
+        ImGui::Text("Image Size = %d x %d", std::min(options.WIDTH, (int)WIDTH), std::min(options.HEIGHT, (int)HEIGHT));
+
+        ImGui::Image((void *)(intptr_t)renderedImageTexture, ImVec2(options.WIDTH, options.HEIGHT));
+        ImGui::End();
+    }
+}
+
 void AnglerED ::Loop() {
-
-    bool show_demo_window = true;
-    bool needToBindTexture = false;
-
-    GLuint renderedImageTexture = 0;
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -96,93 +186,17 @@ void AnglerED ::Loop() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // #ifndef NDEBUG
-        // ImGui::ShowDemoWindow(&show_demo_window);
-        // #endif
+        DrawSettingsMenu();
+        DrawSceneMenu();
+        DrawRenderButton();
+        DrawRenderWindow();
 
-        // Dont modify renderer setting while the renderer is active.
-        if (!options.isRenderActive) {
-            ImGui::Begin("AnglerRT settings");
-            ImGui::Text("Renderer Settings");
-            ImGui::InputInt("Max Depth", &options.MAX_DEPTH);
-            ImGui::InputInt("Samples", &options.SAMPLES_PER_PIXEL);
-            ImGui::InputFloat("Aspect Ratio ", &aspect_ratio);
-            ImGui::InputInt("Image Width", &options.WIDTH);
-            options.HEIGHT = static_cast<int>(options.WIDTH / aspect_ratio);
-            ImGui::Text("Resolution (%d X %d)", options.WIDTH, options.HEIGHT);
-            ImGui::Separator();
-            ImGui::Text("Camera Settings");
-            ImGui::InputInt("Camera FOV", &cameraFOV);
-            static float p[4] = { 0.f, 3.f, 10.f, 0.44f };
-            static float q[4] = { 0.0f, 0.0f, 0.0f, 0.44f };
-            if (ImGui::InputFloat3("Look From", p) || ImGui::InputFloat3("Look At", q))
-                mCamera =
-                    Camera(cameraFOV, aspect_ratio, Point(p[0], p[1], p[2]), Point(q[0], q[1], q[2]), Vec3f(0, 1, 0));
-            ImGui::End();
-        }
-
-        {
-            ImGui::Begin("Scene Settings");
-            ImGui::Text("Resolution (%d X %d)", options.WIDTH, options.HEIGHT);
-            ImGui::Text("Max Depth: %d", options.MAX_DEPTH);
-            ImGui::Text("Samples: %d", options.SAMPLES_PER_PIXEL);
-            ImGui::Text("Aspect Ratio: %.2f", aspect_ratio);
-            ImGui::Separator();
-            ImGui::Text("Camera FOV: %d", cameraFOV);
-            ImGui::End();
-        }
-
-        {
-            ImGui::Begin("AnglerRT");
-            ImGui::Text("Render Window");
-
-            if (ImGui::Button("Render Image") && !options.isRenderActive) {
-                options.image = nullptr;
-
-                std::thread render(&Render::StartRender, *mRenderer);
-                render.detach();
-
-                // renderer.StartRender();
-                needToBindTexture = true;
-            } else {
-                ImGui::Text("Progress : %.2f %%", options.progress * 100);
-            }
-            ImGui::End();
-        }
-
-        if (!options.isRenderActive && options.image) {
-            if (needToBindTexture) {
-                spdlog::info("AnglerED : Binding texture data");
-                // options.image->GammaCorrect();
-
-                std::shared_ptr<uint8_t[]> mBuffer = options.image->getBufferCopy();
-                auto *buffer = new unsigned char[options.WIDTH * options.HEIGHT * 4];
-                for (int i = 0; i < options.WIDTH * options.HEIGHT * 4; i++) {
-                    buffer[i] = mBuffer[i];
-                }
-
-                if (!BindImageTexture(buffer, &renderedImageTexture, options.WIDTH, options.HEIGHT))
-                    spdlog::warn("AnglerED : Binding texture failed");
-                needToBindTexture = false;
-                delete[] buffer;
-            }
-
-            ImGui::Begin("Rendered Image");
-            ImGui::Text("Image Size = %d x %d", std::min(options.WIDTH, WIDTH - 100),
-                        std::min(options.HEIGHT, HEIGHT - 100));
-
-            ImGui::Image((void *)(intptr_t)renderedImageTexture, ImVec2(options.WIDTH, options.HEIGHT));
-            ImGui::End();
-        }
         ImGui::Render();
 
-        // Render here
-        // glClearColor(0.12f, 0.14f, 0.17f, 1.0f);
         glClearColor(0.117f, 0.117f, 0.117f, 1.0f);
 
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        // Swap front and back buffers
         glfwSwapBuffers(window);
     }
 }
@@ -204,9 +218,9 @@ int main(int argc, char *argv[]) {
     int cameraFOV = 35;
 
     // Camera camera(cameraFOV, aspect_ratio, Point(14, 2, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
-    Camera camera = Camera(cameraFOV, aspect_ratio, Point(0, 3, 10), Point(0, 0, 0), Vec3f(0, 1, 0));
+    Camera camera = Camera(cameraFOV, aspect_ratio, Point(0, 1, 10), Point(0, 0, 0), Vec3f(0, 1, 0));
 
-    Scene world = random_scene();
+    Scene world = SphereScene();
 
     const char *TextureFilePath = "D:/Documents/C++/Angler/Angler_ED_RT/Angler/Textures/UV_Debug.png";
 
@@ -217,7 +231,7 @@ int main(int argc, char *argv[]) {
     Render *renderer = new Render(world, camera, options);
 
 #ifdef __WIN32
-    AnglerED anglerED(500, 400, renderer, camera, options);
+    AnglerED anglerED(1024, 600, renderer, camera, options);
     anglerED.Loop();
 #endif
 

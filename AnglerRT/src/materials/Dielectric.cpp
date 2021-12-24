@@ -1,7 +1,5 @@
 #include "Dielectric.h"
-
-Dielectric::Dielectric(Float ior) : IOR(ior) {
-}
+#include <cmath>
 
 bool Dielectric::BSDF(const Ray &ray_in, Color &attenuation, Interaction &interaction, Ray &ray_out) const {
 
@@ -9,8 +7,7 @@ bool Dielectric::BSDF(const Ray &ray_in, Color &attenuation, Interaction &intera
     Float refraction_ratio = interaction.front_face ? (1.0 / IOR) : IOR;
 
     Vec3f unit_direction = ray_in.Direction().Normalize();
-
-    Float cos_theta = fmin(unit_direction.dot(-interaction.Normal), 1.0);
+    Float cos_theta = fmin((-unit_direction).dot(interaction.Normal), 1.0);
     Float sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
     bool cannot_refract = refraction_ratio * sin_theta > 1.0;

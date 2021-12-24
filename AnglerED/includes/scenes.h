@@ -4,6 +4,7 @@
 #include <AnglerRT.h>
 #include <BVH.h>
 
-Scene random_scene();
+Scene RandomScene();
 Scene MeshScene();
 Scene QuickScene();
+Scene SphereScene();
