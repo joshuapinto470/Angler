@@ -1,6 +1,5 @@
 #include "AnglerED.h"
 
-enum GUI_MODE { NOGUI, GUI };
 class AnglerED {
   private:
     // Display settings
@@ -32,7 +31,7 @@ class AnglerED {
 };
 
 AnglerED ::AnglerED(uint16_t Width, uint16_t Height, Render *Renderer, Camera &camera, Options &opt)
-    : io(ImGui::GetIO()), mCamera(camera), options(opt) {
+    :io(ImGui::GetIO()), mCamera(camera), options(opt) {
     WIDTH = Width;
     HEIGHT = Height;
 
@@ -74,8 +73,8 @@ AnglerED ::AnglerED(uint16_t Width, uint16_t Height, Render *Renderer, Camera &c
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    (void)io;
-
+    (void) io;
+    
     ImGui::StyleColorsDark();
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -230,19 +229,13 @@ int main(int argc, char *argv[]) {
 
     Render *renderer = new Render(world, camera, options);
 
-#ifdef __WIN32
+
     AnglerED anglerED(1024, 600, renderer, camera, options);
     anglerED.Loop();
-#endif
-
-#ifdef __unix__
-    renderer->StartRender();
-#endif
 
     return 0;
 }
 
-#ifdef __WIN32
 bool BindImageTexture(unsigned char *buffer, GLuint *out_texture, int image_width, int image_height) {
 
     // Load from buffer
@@ -272,5 +265,3 @@ bool BindImageTexture(unsigned char *buffer, GLuint *out_texture, int image_widt
 
     return true;
 }
-
-#endif
