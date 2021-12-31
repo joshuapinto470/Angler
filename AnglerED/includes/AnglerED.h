@@ -1,6 +1,5 @@
 #pragma once
 
-#ifdef __WIN32
 #include "glad/glad.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -8,7 +7,7 @@
 #include <GLFW/glfw3.h>
 
 bool BindImageTexture(unsigned char *, GLuint *, int, int);
-#endif
+
 
 #include <algorithm>
 #include <cstdio>
