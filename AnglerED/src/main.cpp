@@ -22,6 +22,7 @@ class AnglerED {
     void DrawSceneMenu();
     void DrawSettingsMenu();
     void DrawRenderButton();
+    void DrawScenePicker();
 
   public:
     AnglerED(uint16_t, uint16_t, Render *, Camera &, Options &);
@@ -146,6 +147,38 @@ void AnglerED ::DrawSceneMenu() {
     ImGui::End();
 }
 
+void AnglerED ::DrawScenePicker() {
+    ImGui::Begin("Scene Picker");
+    const char *items[] = { "Random Scene", "Mesh Scene", "Sphere Scene", "Quick Scene" };
+    static int item_current_idx = 0;
+    const char *combo_label = items[item_current_idx];
+
+    if (ImGui::BeginCombo("Scene", combo_label)) {
+        for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
+            const bool is_selected = (item_current_idx == n);
+            if (ImGui::Selectable(items[n], is_selected))
+                item_current_idx = n;
+
+            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+
+            switch (item_current_idx) {
+            case 0:
+                spdlog::info("Selected scene 1");
+                break;
+            case 1:
+                spdlog::info("Selected scene 2");
+                break;
+            default:
+                break;
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::End();
+}
+
 void AnglerED ::DrawRenderWindow() {
     // Check if the renderer is inactive and there is
     // an image to display
@@ -184,6 +217,8 @@ void AnglerED ::Loop() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        DrawScenePicker();
 
         DrawSettingsMenu();
         DrawSceneMenu();

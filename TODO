@@ -7,6 +7,7 @@ Bugs
 - Fix dielectric material
 - Out of bounds texture when y < 2
 - Large images crash AnglerED.
+- Fix camera controls not working in AnglerED 
 
 Features
 - Implement image buffer in camera class
@@ -18,3 +19,5 @@ Features
 - Build scene in AnglerED
 - Multithreading
 - Implementation of a accelaration model BVH, K-Trees etc. 🟩
+- Add stop render button
+- Add Scene picker.
