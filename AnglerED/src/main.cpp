@@ -12,7 +12,7 @@ class AnglerED {
     Render *mRenderer;
     Camera &mCamera;
     Options &options;
-    ImGuiIO &io;
+    //ImGuiIO &io;
     int cameraFOV;
     float aspect_ratio;
     // ImGUI
@@ -25,14 +25,16 @@ class AnglerED {
     void DrawScenePicker();
 
   public:
-    AnglerED(uint16_t, uint16_t, Render *, Camera &, Options &);
+    AnglerED(uint16_t, uint16_t, Render *, Camera &, Options &, GLFWwindow* );
     ~AnglerED();
 
     void Loop();
 };
 
-AnglerED ::AnglerED(uint16_t Width, uint16_t Height, Render *Renderer, Camera &camera, Options &opt)
-    :io(ImGui::GetIO()), mCamera(camera), options(opt) {
+AnglerED ::AnglerED(uint16_t Width, uint16_t Height, Render *Renderer, Camera &camera, Options &opt, GLFWwindow* Window)
+    :mCamera(camera), options(opt) {
+
+    window = Window;
     WIDTH = Width;
     HEIGHT = Height;
 
@@ -43,43 +45,6 @@ AnglerED ::AnglerED(uint16_t Width, uint16_t Height, Render *Renderer, Camera &c
     aspect_ratio = 16.0f / 9.0f;
 
     needToBindTexture = false;
-
-    const char *glsl_version = "#version 130";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-    if (!glfwInit()) {
-        spdlog::error("OpenGL Error! (GLFW INIT FAILED!)");
-        return;
-    }
-
-    // Create a windowed mode window and its OpenGL context
-    window = glfwCreateWindow(WIDTH, HEIGHT, "AnglerED", nullptr, nullptr);
-    if (!window) {
-        glfwTerminate();
-        spdlog::error("OpenGL Error! (WINDOW CREATION FAILED!)");
-        return;
-    }
-
-    // Make the window's context current
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-
-    bool err = gladLoadGL() == 0;
-    if (err) {
-        spdlog::error("OpenGL Error!");
-        return;
-    }
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-
-    (void) io;
-    
-    ImGui::StyleColorsDark();
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
 AnglerED ::~AnglerED() {
@@ -264,8 +229,52 @@ int main(int argc, char *argv[]) {
 
     Render *renderer = new Render(world, camera, options);
 
+    GLFWwindow *window;
+    ImGuiIO& io = ImGui::GetIO();
+    //(void)io;
 
-    AnglerED anglerED(1024, 600, renderer, camera, options);
+    const char *glsl_version = "#version 130";
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+    if (!glfwInit()) {
+        spdlog::error("OpenGL Error! (GLFW INIT FAILED!)");
+        return -1;
+    }
+
+    int WIDTH = 1024;
+    int HEIGHT = 600;
+
+    // Create a windowed mode window and its OpenGL context
+    window = glfwCreateWindow(WIDTH, HEIGHT, "AnglerED", nullptr, nullptr);
+    if (!window) {
+        glfwTerminate();
+        spdlog::error("OpenGL Error! (WINDOW CREATION FAILED!)");
+        return -1;
+    }
+
+    // Make the window's context current
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+
+    bool err = gladLoadGL() == 0;
+    if (err) {
+        spdlog::error("OpenGL Error!");
+        return -1;
+    }
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    (void) io;
+    
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+
+    AnglerED anglerED(1024, 600, renderer, camera, options, window);
     anglerED.Loop();
 
     return 0;
