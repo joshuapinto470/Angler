@@ -1,11 +1,17 @@
 #include "AnglerED.h"
-/*
+
+static void glfw_error_callback(int error, const char* description)
+{
+    fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+}
+
 class AnglerED {
   private:
     // Display settings
     GLFWwindow *window;
+    ImGuiIO& io;
     GLuint renderedImageTexture = 0;
-    uint16_t HEIGHT, WIDTH;
+    int HEIGHT, WIDTH;
     bool needToBindTexture;
 
     // Renderer settings
@@ -25,18 +31,19 @@ class AnglerED {
     void DrawScenePicker();
 
   public:
-    AnglerED(uint16_t, uint16_t, Render *, Camera &, Options &, GLFWwindow* );
+    AnglerED(uint16_t, uint16_t, Render *, Camera &, Options &, GLFWwindow*);
     ~AnglerED();
 
     void Loop();
 };
 
 AnglerED ::AnglerED(uint16_t Width, uint16_t Height, Render *Renderer, Camera &camera, Options &opt, GLFWwindow* Window)
-    :mCamera(camera), options(opt) {
+    :mCamera(camera), options(opt), io(ImGui::GetIO()) {
 
-    window = Window;
     WIDTH = Width;
     HEIGHT = Height;
+
+    window = Window;
 
     mRenderer = Renderer;
     mCamera = camera;
@@ -49,11 +56,6 @@ AnglerED ::AnglerED(uint16_t Width, uint16_t Height, Render *Renderer, Camera &c
 
 AnglerED ::~AnglerED() {
     delete mRenderer;
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    glfwTerminate();
 }
 
 void AnglerED ::DrawSettingsMenu() {
@@ -191,25 +193,22 @@ void AnglerED ::Loop() {
         DrawRenderWindow();
 
         ImGui::Render();
-
+        glfwGetFramebufferSize(window, &WIDTH, &HEIGHT);
+        glViewport(0, 0, WIDTH, HEIGHT);
         glClearColor(0.117f, 0.117f, 0.117f, 1.0f);
-
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
+
     }
 }
 
-*/
-static void glfw_error_callback(int error, const char* description)
-{
-    fprintf(stderr, "Glfw Error %d: %s\n", error, description);
-}
 
 int main(int argc, char *argv[]) {
 
-    spdlog::info("CPU Arch : {} bit", sizeof(void *) * 8);
-    /*
+    //spdlog::info("CPU Arch : {} bit", sizeof(void *) * 8);
+    
     // AnglerRT initialization.
     float aspect_ratio = 16.0 / 9.0;
 
@@ -235,8 +234,7 @@ int main(int argc, char *argv[]) {
 
     Render *renderer = new Render(world, camera, options);
     std :: cout << "Reached 0\n";
-    */
-    // Setup window
+
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
@@ -253,13 +251,13 @@ int main(int argc, char *argv[]) {
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
+    gladLoadGL();
     //glfwSwapInterval(1); // Enable vsync
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); 
-    (void)io;
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -271,77 +269,8 @@ int main(int argc, char *argv[]) {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-    std :: cout << "Reached\n";
-
-    // Main loop
-    while (!glfwWindowShouldClose(window))
-    {
-
-        glfwPollEvents();
-
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
-
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::End();
-        }
-
-        // 3. Show another simple window.
-        if (show_another_window)
-        {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
-            ImGui::End();
-        }
-
-
-        // Rendering
-        ImGui::Render();
-
-        glClearColor(0.117f, 0.117f, 0.117f, 1.0f);
-
-        std :: cout << "Reached 1\n";
-        //int display_w, display_h;
-        //glfwGetFramebufferSize(window, &display_w, &display_h);
-        //glViewport(0, 0, display_w, display_h);
-        //glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(window);
-    }
+    AnglerED angler(1280, 720, renderer, camera, options, window);
+    angler.Loop();
 
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
@@ -350,9 +279,6 @@ int main(int argc, char *argv[]) {
 
     glfwDestroyWindow(window);
     glfwTerminate();
-
-    //AnglerED anglerED(1024, 600, renderer, camera, options, window);
-    //anglerED.Loop();
 
     return 0;
 }
@@ -386,3 +312,4 @@ bool BindImageTexture(unsigned char *buffer, GLuint *out_texture, int image_widt
 
     return true;
 }
+
