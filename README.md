@@ -1,14 +1,5 @@
 # AnglerRT
 
-```
-   _____                 .__              _____________________
-  /  _  \   ____    ____ |  |   __________\______   \__    ___/
- /  /_\  \ /    \  / ___\|  | _/ __ \_  __ \       _/ |    |   
-/    |    \   |  \/ /_/  >  |_\  ___/|  | \/    |   \ |    |   
-\____|__  /___|  /\___  /|____/\___  >__|  |____|_  / |____|   
-        \/     \//_____/           \/             \/           
-```
-
 AnglerRT is a simple Ray Tracing engine.  
 AnglerED is a optional GUI interface using [imgui](https://github.com/ocornut/imgui) to adjust different settings in AnglerRT.
 
