@@ -13,7 +13,7 @@ class Render {
     void StartRender();
 
   private:
-    void RenderScene();
+    void RenderScene(int);
     void InitFromOptions();
     Color Trace(const Ray &, int);
 

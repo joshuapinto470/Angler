@@ -7,7 +7,7 @@
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 
-bool BindImageTexture(unsigned char *, GLuint *, int, int);
+bool BindImageTexture(float *, GLuint *, int, int);
 
 
 #include <algorithm>
@@ -22,3 +22,37 @@ bool BindImageTexture(unsigned char *, GLuint *, int, int);
 #include "obj2angler.h"
 
 #include "scenes.h"
+
+class AnglerED {
+  private:
+    // Display settings
+    GLFWwindow *window;
+    //ImGuiIO& io;
+    GLuint renderedImageTexture = 0;
+    int WIDTH, HEIGHT;
+    bool needToBindTexture = false;
+    int lastPassIndex = 1;
+
+    // Renderer settings
+    Render *mRenderer;
+    Camera mCamera;
+    Options options;
+    Scene mWorld;
+    //ImGuiIO &io;
+    int cameraFOV;
+    float aspect_ratio;
+    // ImGUI
+
+    int Init();
+    void DrawRenderWindow();
+    void DrawSceneMenu();
+    void DrawSettingsMenu();
+    void DrawRenderButton();
+    void DrawScenePicker();
+
+  public:
+    AnglerED(uint16_t, uint16_t);
+    ~AnglerED();
+
+    void Loop();
+};

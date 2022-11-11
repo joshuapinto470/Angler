@@ -49,14 +49,19 @@ void Render::StartRender() {
     mOptions->isRenderActive = true;
 
     mBuffer = std::make_shared<ImageBuffer>(WIDTH, HEIGHT);
+    mOptions->image = mBuffer;
 
     renderStart = std::chrono::high_resolution_clock::now();
-    RenderScene();
+    for (int i = 1; i < SamplesPerPixel + 1; i++){
+        mOptions->progress = ((float)i / SamplesPerPixel);
+        mOptions->pass = i;
+        RenderScene(i);
+        mBuffer->ResetIndex();
+    }
+
     renderEnd = std::chrono::high_resolution_clock::now();
 
     PNG tImage(*mBuffer);
-
-    mOptions->image = mBuffer;
 
     wallEnd = std::chrono::high_resolution_clock::now();
     spdlog::info("Render Done!");
@@ -71,28 +76,29 @@ void Render::StartRender() {
     spdlog::info("Wall Time : {} seconds", elapsedWall.count());
     spdlog::info("R2Wt : {} ", elapsedWall.count() - elapsedRender.count());
 
+    mOptions->progress = 1.0f;
     mOptions->isRenderActive = false;
 }
 
-void Render::RenderScene() {
-    float h_inv = 1.0f / static_cast<float>(HEIGHT);
+void Render::RenderScene(int pass) {
+    //float h_inv = 1.0f / static_cast<float>(HEIGHT);
 
     for (int j = HEIGHT - 1; j >= 0 && !mOptions->stopRender; --j) {
-        mOptions->progress = (float)(HEIGHT - j) * h_inv;
+        //mOptions->progress = (float)(HEIGHT - j) * h_inv;
 
         for (int i = 0; i < WIDTH; ++i) {
             Color pixel_color(0, 0, 0);
 
-            for (int s = 0; s < SamplesPerPixel; ++s) {
-                Float u = (i + random_double()) * width_inv;
-                Float v = (j + random_double()) * height_inv;
+            //for (int s = 0; s < SamplesPerPixel; ++s) {
+            Float u = (i + random_double()) * width_inv;
+            Float v = (j + random_double()) * height_inv;
 
-                Ray ray = mCamera->get_ray(u, v);
-                pixel_color = pixel_color + Trace(ray, MaxDepth);
-            }
+            Ray ray = mCamera->get_ray(u, v);
+            pixel_color = pixel_color + Trace(ray, MaxDepth);
+            //}
 
-            pixel_color = pixel_color * samples_inv;
-            mBuffer->Write(pixel_color);
+            //pixel_color = pixel_color * samples_inv;
+            mBuffer->Accumulate(pixel_color, pass);
         }
     }
 }

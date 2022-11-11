@@ -4,7 +4,7 @@
 
 std::vector<std::vector<std::shared_ptr<Shape>>> LoadMeshFromFile(){
 
-    std::string inputfile = "cornellbox.obj";
+    std::string inputfile = "untitled.obj";
     tinyobj::ObjReaderConfig reader_config;
     reader_config.mtl_search_path = "./"; // Path to material files
 

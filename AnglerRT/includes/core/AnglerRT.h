@@ -33,6 +33,7 @@ struct Options {
     int MAX_DEPTH;
     // stats
     float progress = .0f;
+    int pass = 0;
     bool isRenderActive = false;
     bool stopRender = false;
 

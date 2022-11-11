@@ -53,7 +53,7 @@ Scene SphereScene() {
     auto ground_material = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
     world.Add(std::make_shared<Sphere>(Vec3f(0, -1000, 0), 1000, ground_material));
 
-    auto material1 = std::make_shared<Dielectric>(1.5);
+    auto material1 = std::make_shared<Lambertian>(Color(1.0, 0.0, 1.0));
     world.Add(std::make_shared<Sphere>(Vec3f(0, 1, 4), 1.0, material1));
 
     return world;

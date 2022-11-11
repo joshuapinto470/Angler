@@ -14,10 +14,16 @@ class ImageBuffer : public Image {
         return WIDTH;
     }
     void Write(const Color &) override;
-    std::unique_ptr<uint8_t[]> getBufferCopy() const override;
+    void WriteAt(const Color &, int x, int y);
+    void Accumulate(const Color &, int);
+    Color ReadAt(int x, int y);
+
+    void ResetIndex();
+    std::unique_ptr<float[]> getBufferCopy() const override;
 
   private:
     unsigned WIDTH, HEIGHT;
     int buffer_index;
-    std::unique_ptr<uint8_t[]> mBuffer;
+    std::unique_ptr<float[]> mBuffer;
+    std::unique_ptr<float[]> mAccumulateBuffer;
 };

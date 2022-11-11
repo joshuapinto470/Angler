@@ -23,6 +23,7 @@ add_subdirectory(vendor/GLFW/)
 
 SET(SRC_FILES 
 src/main.cpp
+src/AnglerED.cpp
 src/scenes.cpp
 src/obj2angler.cpp
 src/glad.c

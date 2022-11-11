@@ -9,10 +9,15 @@ PNG::PNG(const char *FileName, unsigned int w, unsigned int h) : fileName(FileNa
 }
 
 PNG::PNG(const Image &image) {
-    fileName = "TempFile.png";
+    fileName = "Rendered.png";
     Width = image.getWidth();
     Height = image.getHeight();
-    buffer = image.getBufferCopy();
+    size_t image_size = Width * Height * 4;
+    std::unique_ptr<float[]> tempBuffer = image.getBufferCopy();
+    buffer = std::make_unique<uint8_t[]>(image_size);
+    for (int i = 0; i < image_size; i++)
+        buffer[i] = (uint8_t) tempBuffer[i] * 255.0f;
+
 }
 
 void PNG::Write(const Color &color) {
@@ -60,11 +65,12 @@ void PNG::GammaCorrect() {
     }
 }
 
-std::unique_ptr<uint8_t[]> PNG::getBufferCopy() const {
-    std::unique_ptr<uint8_t[]> tBuffer;
-    tBuffer = std::make_unique<uint8_t[]>(Width * Height);
+std::unique_ptr<float[]> PNG::getBufferCopy() const {
+    std::unique_ptr<float[]> tBuffer;
+
+    tBuffer = std::make_unique<float[]>(Width * Height);
     for (int i = 0; i < Width * Height * 4; i++)
-        tBuffer[i] = buffer[i];
+        tBuffer[i] = buffer[i] / 255.0f;
 
     return tBuffer;
 }

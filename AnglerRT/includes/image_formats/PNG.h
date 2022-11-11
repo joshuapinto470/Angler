@@ -18,7 +18,7 @@ class PNG : public Image {
     void Write(const Color &) override;
     unsigned getHeight() const override;
     unsigned getWidth() const override;
-    std::unique_ptr<uint8_t[]> getBufferCopy() const override;
+    std::unique_ptr<float[]> getBufferCopy() const override;
 
   private:
     std ::unique_ptr<uint8_t[]> buffer;
