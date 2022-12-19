@@ -2,6 +2,11 @@
 // Created by Joshua on 20-06-2021.
 //
 
+/*
+RGBA [0 - 1] -> float HDR
+RGBA [0 - 255] -> int
+*/
+
 #include "PNG.h"
 
 PNG::PNG(const char *FileName, unsigned int w, unsigned int h) : fileName(FileName), Width(w), Height(h) {
@@ -16,7 +21,7 @@ PNG::PNG(const Image &image) {
     std::unique_ptr<float[]> tempBuffer = image.getBufferCopy();
     buffer = std::make_unique<uint8_t[]>(image_size);
     for (int i = 0; i < image_size; i++)
-        buffer[i] = (uint8_t) tempBuffer[i] * 255.0f;
+        buffer[i] = std::clamp((int) (tempBuffer[i] * 255.0f), 0, 255);
 
 }
 

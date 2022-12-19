@@ -61,10 +61,10 @@ AnglerED ::AnglerED(uint16_t Width, uint16_t Height){
     //mWorld = QuickScene();
     mWorld = RandomScene();
 
-    const char *TextureFilePath = "E:/Documents/C++/Angler/Angler/build/Textures/UV_Debug.png";
+    //const char *TextureFilePath = "E:/Documents/C++/Angler/Angler/build/Textures/UV_Debug.png";
 
-    std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(TextureFilePath);
-    mWorld.SetEnvironmentTexture(envTex);
+    //std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(TextureFilePath);
+    mWorld.SetEnvironmentTexture(nullptr);
     options.isRenderActive = false;
 
     mRenderer = new Render(mWorld, mCamera, options);
