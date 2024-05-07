@@ -1,6 +1,8 @@
 project(AnglerED)
 set (CMAKE_CXX_STANDARD 17)
 
+# add_compile_definitions(USE_ASSIMP)
+
 include_directories(
         "includes/imgui"
         "../external_includes"
@@ -11,9 +13,9 @@ include_directories(
         "../AnglerRT/includes/image_formats"
         "../AnglerRT/includes"
 	"../tools/tinyobjloader"
+        "../tools/glm"
         "includes"
 )
-
 
 find_library(SPDLOG_LIB spdlog ../libs/spdlog)
 SET(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -26,6 +28,9 @@ src/main.cpp
 src/AnglerED.cpp
 src/scenes.cpp
 src/obj2angler.cpp
+src/ModelLoader.cpp
+src/Model.cpp
+src/Mesh.cpp
 src/glad.c
 src/imgui/imgui.cpp
 src/imgui/imgui_demo.cpp
@@ -35,6 +40,8 @@ src/imgui/imgui_impl_glfw.cpp
 src/imgui/imgui_impl_opengl3.cpp
 src/imgui/imgui_tables.cpp
 )
+
+
 
 add_executable(AnglerED
 ${SRC_FILES}

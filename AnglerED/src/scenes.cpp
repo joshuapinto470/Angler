@@ -62,20 +62,22 @@ Scene SphereScene() {
 Scene MeshScene() {
     Scene world;
 
-    std::vector<std::vector<std::shared_ptr<Shape>>> mesh = LoadMeshFromFile();
+    // #ifdef USE_ASSIMP
+    // #else
+    // std::vector<std::vector<std::shared_ptr<Shape>>> mesh = LoadMeshFromFile();
+    // #endif
+    // // std :: shared_ptr<Material> material1 = std :: make_shared<Dielectric>(1.0);
+    // // std :: shared_ptr<Material> material3 = std :: make_shared<Metallic>(Color(0.8, 0.8, 0.5), 0.01);
+    // // std :: shared_ptr<Material> glass_mat = std :: make_shared<Glass>(Color(1.0, 1.0, 1.0), 1.0, 1.0);
 
-    // std :: shared_ptr<Material> material1 = std :: make_shared<Dielectric>(1.0);
-    // std :: shared_ptr<Material> material3 = std :: make_shared<Metallic>(Color(0.8, 0.8, 0.5), 0.01);
-    // std :: shared_ptr<Material> glass_mat = std :: make_shared<Glass>(Color(1.0, 1.0, 1.0), 1.0, 1.0);
+    // // world.Add( std :: make_shared<Sphere>(Point(0, 0, -1), 0.5, material1));
+    // // world.Add( std :: make_shared<Sphere>(Point(-2, 0, -1), 0.5, glass_mat));
+    // // world.Add( std :: make_shared<Sphere>(Point(2, 0, -1), 0.5, material3));
 
-    // world.Add( std :: make_shared<Sphere>(Point(0, 0, -1), 0.5, material1));
-    // world.Add( std :: make_shared<Sphere>(Point(-2, 0, -1), 0.5, glass_mat));
-    // world.Add( std :: make_shared<Sphere>(Point(2, 0, -1), 0.5, material3));
-
-    for (auto &i : mesh) {
-        for (auto &j : i)
-            world.Add(j);
-    }
+    // for (auto &i : mesh) {
+    //     for (auto &j : i)
+    //         world.Add(j);
+    // }
     return world;
 }
 

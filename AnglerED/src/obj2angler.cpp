@@ -1,3 +1,4 @@
+/*
 #define TINYOBJLOADER_IMPLEMENTATION
 
 #include "obj2angler.h"
@@ -77,3 +78,5 @@ std::vector<std::vector<std::shared_ptr<Shape>>> LoadMeshFromFile(){
 
     return meshes;
 }
+
+*/

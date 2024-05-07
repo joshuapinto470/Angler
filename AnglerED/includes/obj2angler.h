@@ -1,6 +1,6 @@
 #pragma once
 
-
+/*
 #include "tiny_obj_loader.h"
 #include "AnglerRT.h"
 
@@ -8,3 +8,4 @@
 
 
 std::vector<std::vector<std::shared_ptr<Shape>>> LoadMeshFromFile();
+*/

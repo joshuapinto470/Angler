@@ -51,8 +51,6 @@ AnglerED ::AnglerED(uint16_t Width, uint16_t Height){
     WIDTH = options.WIDTH;
     HEIGHT = options.HEIGHT;
 
-
-
     // Camera camera(cameraFOV, aspect_ratio, Point(14, 2, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
     mCamera = Camera(cameraFOV, aspect_ratio, Point(0, 1, 10), Point(0, 0, 0), Vec3f(0, 1, 0));
 
@@ -60,6 +58,9 @@ AnglerED ::AnglerED(uint16_t Width, uint16_t Height){
     //mWorld = MeshScene();
     //mWorld = QuickScene();
     mWorld = RandomScene();
+    ModelLoader loader;
+    Model model = loader.LoadModel("/home/joshua/Projects/Angler/res/simple.obj");
+    model.PrintModelInfo();
 
     //const char *TextureFilePath = "E:/Documents/C++/Angler/Angler/build/Textures/UV_Debug.png";
 
@@ -143,38 +144,6 @@ void AnglerED ::DrawSceneMenu() {
     ImGui::End();
 }
 
-void AnglerED ::DrawScenePicker() {
-    ImGui::Begin("Scene Picker");
-    const char *items[] = { "Random Scene", "Mesh Scene", "Sphere Scene", "Quick Scene" };
-    static int item_current_idx = 0;
-    const char *combo_label = items[item_current_idx];
-
-    if (ImGui::BeginCombo("Scene", combo_label)) {
-        for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
-            const bool is_selected = (item_current_idx == n);
-            if (ImGui::Selectable(items[n], is_selected))
-                item_current_idx = n;
-
-            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            if (is_selected)
-                ImGui::SetItemDefaultFocus();
-
-            switch (item_current_idx) {
-            case 0:
-                //spdlog::info("Selected scene 1");
-                break;
-            case 1:
-                spdlog::info("Selected scene 2");
-                break;
-            default:
-                break;
-            }
-        }
-        ImGui::EndCombo();
-    }
-    ImGui::End();
-}
-
 void AnglerED ::DrawRenderWindow() {
     if (options.image) {
         if(options.pass - lastPassIndex > 2){
@@ -203,22 +172,21 @@ void AnglerED ::Loop() {
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
+        // ImGui Begin
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
-        DrawScenePicker();
-
         DrawSettingsMenu();
         DrawSceneMenu();
-        DrawScenePicker();
+        // DrawScenePicker();
         DrawRenderButton();
         DrawRenderWindow();
-
         ImGui::Render();
+        // ImGui End
+
         glfwGetFramebufferSize(window, &WIDTH, &HEIGHT);
         glViewport(0, 0, WIDTH, HEIGHT);
-        glClearColor(0.117f, 0.117f, 0.117f, 1.0f);
+        glClearColor(0.043f, 0.054f, 0.078f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

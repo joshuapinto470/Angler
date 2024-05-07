@@ -16,18 +16,17 @@ bool BindImageTexture(float *, GLuint *, int, int);
 #include <utility>
 
 #include "AnglerRT.h"
-#include "BVH.h"
 #include "Render.h"
 
-#include "obj2angler.h"
-
 #include "scenes.h"
+
+#include <Model.h>
+#include <ModelLoader.h>
 
 class AnglerED {
   private:
     // Display settings
     GLFWwindow *window;
-    //ImGuiIO& io;
     GLuint renderedImageTexture = 0;
     int WIDTH, HEIGHT;
     bool needToBindTexture = false;
@@ -38,17 +37,14 @@ class AnglerED {
     Camera mCamera;
     Options options;
     Scene mWorld;
-    //ImGuiIO &io;
     int cameraFOV;
     float aspect_ratio;
-    // ImGUI
 
     int Init();
     void DrawRenderWindow();
     void DrawSceneMenu();
     void DrawSettingsMenu();
     void DrawRenderButton();
-    void DrawScenePicker();
 
   public:
     AnglerED(uint16_t, uint16_t);
