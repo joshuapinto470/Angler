@@ -1,18 +1,22 @@
 #include <AnglerED.h>
 
-static void glfw_error_callback(int, const char*);
+#include <glm/gtc/matrix_transform.hpp>
 
-int AnglerED ::Init(){
+
+static void glfw_error_callback(int, const char *);
+
+int AnglerED ::Init()
+{
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
 
     // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
+    const char *glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
     // Create window with graphics context
     window = glfwCreateWindow(1280, 720, "AnglerED", NULL, NULL);
@@ -20,16 +24,17 @@ int AnglerED ::Init(){
         return 1;
     glfwMakeContextCurrent(window);
     gladLoadGL();
-    //glfwSwapInterval(1); // Enable vsync
+    // glfwSwapInterval(1); // Enable vsync
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
+    // ImGui::StyleColorsClassic();
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -37,11 +42,12 @@ int AnglerED ::Init(){
     return 1;
 }
 
-AnglerED ::AnglerED(uint16_t Width, uint16_t Height){
-    //Options options;
+AnglerED ::AnglerED(uint16_t Width, uint16_t Height)
+{
+    // Options options;
     aspect_ratio = 16.0f / 9.0f;
     cameraFOV = 35.0f;
-    
+
     options.MAX_DEPTH = 4;
     options.SAMPLES_PER_PIXEL = 30;
     options.WIDTH = Width;
@@ -54,26 +60,27 @@ AnglerED ::AnglerED(uint16_t Width, uint16_t Height){
     // Camera camera(cameraFOV, aspect_ratio, Point(14, 2, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
     mCamera = Camera(cameraFOV, aspect_ratio, Point(0, 1, 10), Point(0, 0, 0), Vec3f(0, 1, 0));
 
-    //mWorld = SphereScene();
-    //mWorld = MeshScene();
-    //mWorld = QuickScene();
+    // mWorld = SphereScene();
+    // mWorld = MeshScene();
+    // mWorld = QuickScene();
     mWorld = RandomScene();
     ModelLoader loader;
-    Model model = loader.LoadModel("/home/joshua/Projects/Angler/res/simple.obj");
-    model.PrintModelInfo();
+    mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/simple.obj");
+    // mModel.PrintModelInfo();
 
-    //const char *TextureFilePath = "E:/Documents/C++/Angler/Angler/build/Textures/UV_Debug.png";
+    // const char *TextureFilePath = "E:/Documents/C++/Angler/Angler/build/Textures/UV_Debug.png";
 
-    //std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(TextureFilePath);
+    // std ::shared_ptr<EnvironmentTexture> envTex = std ::make_shared<EnvironmentTexture>(TextureFilePath);
     mWorld.SetEnvironmentTexture(nullptr);
     options.isRenderActive = false;
 
     mRenderer = new Render(mWorld, mCamera, options);
-    
+
     Init();
 }
 
-AnglerED ::~AnglerED() {
+AnglerED ::~AnglerED()
+{
     delete mRenderer;
 
     // Cleanup
@@ -85,11 +92,13 @@ AnglerED ::~AnglerED() {
     glfwTerminate();
 }
 
-void AnglerED ::DrawSettingsMenu() {
+void AnglerED ::DrawSettingsMenu()
+{
     // The settings for the renderer.
     // This is disabled when the renderer is active
     ImGui::Begin("AnglerRT settings");
-    if (!options.isRenderActive) {
+    if (!options.isRenderActive)
+    {
         ImGui::Text("Renderer Settings");
         ImGui::InputInt("Max Depth", &options.MAX_DEPTH);
         ImGui::InputInt("Samples", &options.SAMPLES_PER_PIXEL);
@@ -100,23 +109,27 @@ void AnglerED ::DrawSettingsMenu() {
         ImGui::Separator();
         ImGui::Text("Camera Settings");
         ImGui::InputInt("Camera FOV", &cameraFOV);
-        static float p[4] = { 0.f, 3.f, 10.f, 0.44f };
-        static float q[4] = { 0.0f, 0.0f, 0.0f, 0.44f };
+        static float p[4] = {0.f, 3.f, 10.f, 0.44f};
+        static float q[4] = {0.0f, 0.0f, 0.0f, 0.44f};
         if (ImGui::InputFloat3("Look From", p) || ImGui::InputFloat3("Look At", q))
             mCamera = Camera(cameraFOV, aspect_ratio, Point(p[0], p[1], p[2]), Point(q[0], q[1], q[2]), Vec3f(0, 1, 0));
-    } else {
+    }
+    else
+    {
         ImGui::Text("Render is in progress.");
     }
     ImGui::End();
 }
 
-void AnglerED ::DrawRenderButton() {
+void AnglerED ::DrawRenderButton()
+{
     // Spawn a render thread when the button is pressed.
     // If the renderer is active then display the progress of the renderer.
     ImGui::Begin("AnglerRT");
     ImGui::Text("Render Window");
 
-    if (ImGui::Button("Render Image") && !options.isRenderActive) {
+    if (ImGui::Button("Render Image") && !options.isRenderActive)
+    {
         options.image = nullptr;
         lastPassIndex = 1;
         delete mRenderer;
@@ -126,14 +139,17 @@ void AnglerED ::DrawRenderButton() {
 
         // renderer.StartRender();
         needToBindTexture = true;
-    } else {
+    }
+    else
+    {
         ImGui::Text("Progress : %.2f %%", options.progress * 100);
         ImGui::Text("Pass : %d / %d", options.pass, options.SAMPLES_PER_PIXEL);
     }
     ImGui::End();
 }
 
-void AnglerED ::DrawSceneMenu() {
+void AnglerED ::DrawSceneMenu()
+{
     ImGui::Begin("Scene Settings");
     ImGui::Text("Resolution (%d X %d)", options.WIDTH, options.HEIGHT);
     ImGui::Text("Max Depth: %d", options.MAX_DEPTH);
@@ -144,33 +160,57 @@ void AnglerED ::DrawSceneMenu() {
     ImGui::End();
 }
 
-void AnglerED ::DrawRenderWindow() {
-    if (options.image) {
-        if(options.pass - lastPassIndex > 2){
-                lastPassIndex = options.pass;
-                std::shared_ptr<float[]> mBuffer = options.image->getBufferCopy();
-                int BufferSize = options.HEIGHT * options.WIDTH * 4;
-                auto *buffer = new float[BufferSize];
-                memcpy(buffer, mBuffer.get(), BufferSize * sizeof(float));
+void AnglerED ::DrawRenderWindow()
+{
+    if (options.image)
+    {
+        if (options.pass - lastPassIndex > 2)
+        {
+            lastPassIndex = options.pass;
+            std::shared_ptr<float[]> mBuffer = options.image->getBufferCopy();
+            int BufferSize = options.HEIGHT * options.WIDTH * 4;
+            auto *buffer = new float[BufferSize];
+            memcpy(buffer, mBuffer.get(), BufferSize * sizeof(float));
 
-                if (!BindImageTexture(buffer, &renderedImageTexture, options.WIDTH, options.HEIGHT))
-                    spdlog::warn("AnglerED : Binding texture failed");
-                needToBindTexture = false;
-                delete[] buffer;
+            if (!BindImageTexture(buffer, &renderedImageTexture, options.WIDTH, options.HEIGHT))
+                spdlog::warn("AnglerED : Binding texture failed");
+            needToBindTexture = false;
+            delete[] buffer;
         }
-            ImGui::Begin("Rendered Image");
-            ImGui::Text("Image Size = %d x %d", std::min(options.WIDTH, (int)WIDTH), std::min(options.HEIGHT, (int)HEIGHT));
+        ImGui::Begin("Rendered Image");
+        ImGui::Text("Image Size = %d x %d", std::min(options.WIDTH, (int)WIDTH), std::min(options.HEIGHT, (int)HEIGHT));
 
-            ImGui::Image((void *)(intptr_t)renderedImageTexture, ImVec2(options.WIDTH, options.HEIGHT));
-            ImGui::End();
-        
+        ImGui::Image((void *)(intptr_t)renderedImageTexture, ImVec2(options.WIDTH, options.HEIGHT));
+        ImGui::End();
     }
 }
 
-void AnglerED ::Loop() {
+void AnglerED ::Loop()
+{
 
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+    mModel.initModel();
+    Shader shader("/home/joshua/Projects/Angler/res/base.vert", "/home/joshua/Projects/Angler/res/base.frag");
+    shader.use();
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
+
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)1280 / (float)720, 0.1f, 100.0f);
+    shader.setMat4("projection", projection);
+
+    glm::mat4 view;
+    view = glm::lookAt(glm::vec3(0.0f, 5.0f, 3.0f),
+                       glm::vec3(0.0f, 0.0f, 0.0f),
+                       glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    shader.setMat4("view", view);
+
+    glClearColor(0.043f, 0.054f, 0.078f, 1.0f);
+    while (!glfwWindowShouldClose(window))
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        mModel.Draw();
 
         // ImGui Begin
         ImGui_ImplOpenGL3_NewFrame();
@@ -186,23 +226,20 @@ void AnglerED ::Loop() {
 
         glfwGetFramebufferSize(window, &WIDTH, &HEIGHT);
         glViewport(0, 0, WIDTH, HEIGHT);
-        glClearColor(0.043f, 0.054f, 0.078f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
-
+        glfwPollEvents();
     }
 }
 
-static void glfw_error_callback(int error, const char* description)
+static void glfw_error_callback(int error, const char *description)
 {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-
-
-bool BindImageTexture(float *buffer, GLuint *out_texture, int image_width, int image_height) {
+bool BindImageTexture(float *buffer, GLuint *out_texture, int image_width, int image_height)
+{
 
     // Load from buffer
     float *image_data = buffer;
@@ -218,7 +255,7 @@ bool BindImageTexture(float *buffer, GLuint *out_texture, int image_width, int i
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                    GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+                    GL_CLAMP_TO_EDGE);                                   // This is required on WebGL for non power-of-two textures
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
 
     // Upload pixels into texture
@@ -231,4 +268,3 @@ bool BindImageTexture(float *buffer, GLuint *out_texture, int image_width, int i
 
     return true;
 }
-

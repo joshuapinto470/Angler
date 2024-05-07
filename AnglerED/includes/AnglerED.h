@@ -37,6 +37,7 @@ class AnglerED {
     Camera mCamera;
     Options options;
     Scene mWorld;
+    Model mModel;
     int cameraFOV;
     float aspect_ratio;
 

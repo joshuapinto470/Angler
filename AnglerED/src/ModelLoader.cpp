@@ -56,7 +56,7 @@ Model ModelLoader ::LoadModel(std ::string path)
 
         for (size_t f = 0; f < shape.mesh.num_face_vertices.size(); f++)
         {
-            int fv = 3; // This should be 3 since we triangulate the mesh.
+            int fv = size_t(shape.mesh.num_face_vertices[f]); // This should be 3 since we triangulate the mesh.
             Vertex vertex;
             unsigned vi; // vertex index;
 
@@ -85,9 +85,9 @@ Model ModelLoader ::LoadModel(std ::string path)
                     tinyobj::real_t ty = attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
                     vertex.uv = glm::vec2(tx, ty);
                 }
+                vertices.push_back(vertex);
             }
 
-            vertices.push_back(vertex);
             indices.push_back(vi);
             index_offset += fv;
         }
