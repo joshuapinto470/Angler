@@ -31,6 +31,7 @@ src/obj2angler.cpp
 src/ModelLoader.cpp
 src/Model.cpp
 src/Mesh.cpp
+src/Shader.cpp
 src/glad.c
 src/imgui/imgui.cpp
 src/imgui/imgui_demo.cpp

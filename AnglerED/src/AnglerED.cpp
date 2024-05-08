@@ -1,8 +1,5 @@
 #include <AnglerED.h>
 
-#include <glm/gtc/matrix_transform.hpp>
-
-
 static void glfw_error_callback(int, const char *);
 
 int AnglerED ::Init()
@@ -15,14 +12,21 @@ int AnglerED ::Init()
     const char *glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_SAMPLES, 4);
     // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
-
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    // 3.0+ only
     // Create window with graphics context
     window = glfwCreateWindow(1280, 720, "AnglerED", NULL, NULL);
     if (window == NULL)
+    {
+        glfwTerminate();
         return 1;
+    }
     glfwMakeContextCurrent(window);
+    glfwSetWindowUserPointer(window, static_cast<void *>(this));
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_cb);
+
     gladLoadGL();
     // glfwSwapInterval(1); // Enable vsync
 
@@ -57,7 +61,6 @@ AnglerED ::AnglerED(uint16_t Width, uint16_t Height)
     WIDTH = options.WIDTH;
     HEIGHT = options.HEIGHT;
 
-    // Camera camera(cameraFOV, aspect_ratio, Point(14, 2, 3), Point(0, 0, 0), Vec3f(0, 1, 0));
     mCamera = Camera(cameraFOV, aspect_ratio, Point(0, 1, 10), Point(0, 0, 0), Vec3f(0, 1, 0));
 
     // mWorld = SphereScene();
@@ -195,41 +198,62 @@ void AnglerED ::Loop()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
 
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)1280 / (float)720, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
     shader.setMat4("projection", projection);
 
     glm::mat4 view;
-    view = glm::lookAt(glm::vec3(0.0f, 5.0f, 3.0f),
+    view = glm::lookAt(glm::vec3(0.0f, 2.0f, 5.0f),
                        glm::vec3(0.0f, 0.0f, 0.0f),
                        glm::vec3(0.0f, 1.0f, 0.0f));
-    
+
     shader.setMat4("view", view);
 
-    glClearColor(0.043f, 0.054f, 0.078f, 1.0f);
+    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
+    shader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+    shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+    shader.setVec3("lightPos", lightPos);
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         mModel.Draw();
 
-        // ImGui Begin
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        DrawSettingsMenu();
-        DrawSceneMenu();
-        // DrawScenePicker();
-        DrawRenderButton();
-        DrawRenderWindow();
-        ImGui::Render();
-        // ImGui End
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+        shader.setMat4("projection", projection);
 
-        glfwGetFramebufferSize(window, &WIDTH, &HEIGHT);
-        glViewport(0, 0, WIDTH, HEIGHT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        RenderImGUI();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+    }
+}
+
+void AnglerED::RenderImGUI()
+{
+    // ImGui Begin
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    DrawSettingsMenu();
+    DrawSceneMenu();
+    DrawRenderButton();
+    DrawRenderWindow();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    // ImGui End
+}
+
+void AnglerED::framebuffer_size_cb(GLFWwindow *window, int w, int h)
+{
+    glViewport(0, 0, w, h);
+    AnglerED *angler = static_cast<AnglerED *>(glfwGetWindowUserPointer(window));
+    if (angler)
+    {
+        angler->WIDTH = w;
+        angler->HEIGHT = h;
     }
 }
 

@@ -7,6 +7,11 @@
 #include "tiny_obj_loader.h"
 #endif
 
+void printvec3(const std::string s, const tinyobj::real_t v[3])
+{
+    std::cout << s.c_str() << ": " << v[0] << ", " << v[1] << ", " << v[2] << "\n";
+}
+
 ModelLoader ::ModelLoader()
 {
 }
@@ -24,8 +29,8 @@ Model ModelLoader ::LoadModel(std ::string path)
 {
     tinyobj::ObjReaderConfig reader_config;
     // .mtl search path same as model directory
-    reader_config.mtl_search_path = "/home/joshua/Projects/Angler/res/";
-    // reader_config.triangulate = true;
+    // reader_config.mtl_search_path = "/home/joshua/Projects/Angler/res/";
+    reader_config.triangulate = true;
 
     tinyobj::ObjReader reader;
 
@@ -35,6 +40,7 @@ Model ModelLoader ::LoadModel(std ::string path)
         {
             spdlog::error("OBJ File Reader {}", reader.Error());
         }
+        return Model();
     }
 
     if (!reader.Warning().empty())
@@ -45,6 +51,15 @@ Model ModelLoader ::LoadModel(std ::string path)
     auto &attrib = reader.GetAttrib();
     auto &shapes = reader.GetShapes();
     auto &materials = reader.GetMaterials();
+
+    // for (const auto &mat : materials)
+    // {
+    //     std ::cout << mat.name.c_str() << "\n";
+
+    //     printvec3("Diffuse", mat.diffuse);
+    //     printvec3("Ambient", mat.ambient);
+    //     printvec3("Specular", mat.specular);
+    // }
 
     std::vector<Mesh> meshes;
 
@@ -57,8 +72,16 @@ Model ModelLoader ::LoadModel(std ::string path)
         for (size_t f = 0; f < shape.mesh.num_face_vertices.size(); f++)
         {
             int fv = size_t(shape.mesh.num_face_vertices[f]); // This should be 3 since we triangulate the mesh.
+            assert(fv == 3);
             Vertex vertex;
             unsigned vi; // vertex index;
+
+            int mat_id = shape.mesh.material_ids[f];
+            if (mat_id >= 0)
+            {
+                tinyobj::material_t mat = materials[mat_id];
+                vertex.Diffuse = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
+            }
 
             for (size_t v = 0; v < fv; v++)
             {
