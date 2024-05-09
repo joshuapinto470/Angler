@@ -34,7 +34,8 @@ int AnglerED ::Init()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
-    (void)io;
+    // io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -43,7 +44,8 @@ int AnglerED ::Init()
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-    return 1;
+
+    return 0;
 }
 
 AnglerED ::AnglerED(uint16_t Width, uint16_t Height)
@@ -114,6 +116,8 @@ void AnglerED ::DrawSettingsMenu()
         ImGui::InputInt("Camera FOV", &cameraFOV);
         static float p[4] = {0.f, 3.f, 10.f, 0.44f};
         static float q[4] = {0.0f, 0.0f, 0.0f, 0.44f};
+        glm::vec3 c = glm::vec3(1.0, 2.0, 3.0);
+        DrawVec3Controls("Camera", c);
         if (ImGui::InputFloat3("Look From", p) || ImGui::InputFloat3("Look At", q))
             mCamera = Camera(cameraFOV, aspect_ratio, Point(p[0], p[1], p[2]), Point(q[0], q[1], q[2]), Vec3f(0, 1, 0));
     }
@@ -149,6 +153,69 @@ void AnglerED ::DrawRenderButton()
         ImGui::Text("Pass : %d / %d", options.pass, options.SAMPLES_PER_PIXEL);
     }
     ImGui::End();
+}
+
+void AnglerED ::DrawVec3Controls(const char *label, glm::vec3 &value)
+{
+    /*
+    ImGui::Columns(2);
+    ImGui::SetColumnWidth(0, 100.0f);
+    ImGui::Text(label);
+    ImGui::NextColumn();
+
+    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{1, 5});
+
+    float lineHeight = 19.0;
+    ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9, 0.2, 0.2, 1.0});
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.9, 0.2, 0.2, 1.0});
+
+    if (ImGui::Button("X", buttonSize))
+    {
+        value.x = 0.0f;
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::SameLine();
+    ImGui::DragFloat("##X", &value.x, 0.1f);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    // Y
+    // ImGui::PushItemWidth(ImGui::CalcItemWidth());
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.8f, 0.15f, 1.0f});
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.2, 0.9, 0.2, 1.0});
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.1, 0.8, 0.15, 1.0});
+    if (ImGui::Button("Y", buttonSize))
+    {
+        value.y = 0.0f;
+    }
+    ImGui::PopStyleColor(3);
+
+    ImGui::SameLine();
+    ImGui::DragFloat("##Y", &value.y, 0.1f);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    // Z
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.1f, 0.8f, 1.0f});
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.1, 0.2, 0.8, 1.0});
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.1, 0.2, 0.8, 1.0});
+    if (ImGui::Button("Z", buttonSize))
+    {
+        value.z = 0.0f;
+    }
+    ImGui::PopStyleColor(3);
+
+    ImGui::SameLine();
+    ImGui::DragFloat("##Z", &value.z, 0.1f);
+    ImGui::PopItemWidth();
+    ImGui::PopStyleVar();
+
+    ImGui::Columns(1);
+    */
 }
 
 void AnglerED ::DrawSceneMenu()
@@ -208,6 +275,8 @@ void AnglerED ::Loop()
 
     shader.setMat4("view", view);
 
+    glm::mat4 model = glm::mat4(1.0f);
+
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     shader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
@@ -218,13 +287,16 @@ void AnglerED ::Loop()
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        double t = glfwGetTime();
+        model = glm::rotate(model, glm::radians(0.15f), glm::normalize(glm::vec3(0.0, 1.0, 0.0)));
+        shader.setMat4("model", model);
+
 
         mModel.Draw();
+        RenderImGUI();
 
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
         shader.setMat4("projection", projection);
-
-        RenderImGUI();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -237,12 +309,14 @@ void AnglerED::RenderImGUI()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+    // ImGui::DockSpaceOverViewport();
     DrawSettingsMenu();
     DrawSceneMenu();
     DrawRenderButton();
     DrawRenderWindow();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     // ImGui End
 }
 

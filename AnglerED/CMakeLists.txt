@@ -15,6 +15,9 @@ include_directories(
 	"../tools/tinyobjloader"
         "../tools/glm"
         "includes"
+        "includes/Renderer"
+        "includes/WindowManager"
+        "includes/SceneManager"
 )
 
 find_library(SPDLOG_LIB spdlog ../libs/spdlog)
@@ -31,8 +34,11 @@ src/obj2angler.cpp
 src/ModelLoader.cpp
 src/Model.cpp
 src/Mesh.cpp
-src/Shader.cpp
 src/glad.c
+src/Application.cpp
+src/Renderer/Shader.cpp
+src/Renderer/GLEngine.cpp
+src/WindowManager/WindowManager.cpp
 src/imgui/imgui.cpp
 src/imgui/imgui_demo.cpp
 src/imgui/imgui_widgets.cpp

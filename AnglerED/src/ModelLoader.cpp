@@ -1,5 +1,8 @@
 #include <ModelLoader.h>
 #include "spdlog/spdlog.h"
+#include <GLEngine.h>
+
+using GLEngine::Vertex;
 
 #ifndef USE_ASSIMP
 // Load TinyObjLoader if Assimp is not used.
@@ -51,15 +54,6 @@ Model ModelLoader ::LoadModel(std ::string path)
     auto &attrib = reader.GetAttrib();
     auto &shapes = reader.GetShapes();
     auto &materials = reader.GetMaterials();
-
-    // for (const auto &mat : materials)
-    // {
-    //     std ::cout << mat.name.c_str() << "\n";
-
-    //     printvec3("Diffuse", mat.diffuse);
-    //     printvec3("Ambient", mat.ambient);
-    //     printvec3("Specular", mat.specular);
-    // }
 
     std::vector<Mesh> meshes;
 

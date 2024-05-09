@@ -10,7 +10,6 @@ private:
 public:
     Model() = default;
     Model(std::vector<Mesh>);
-    void PrintModelInfo();
     void Draw();
     void initModel();
     ~Model() {}

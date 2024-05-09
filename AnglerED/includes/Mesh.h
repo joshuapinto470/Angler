@@ -1,31 +1,27 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <vector>
-#include <string>
-#include <glad/glad.h>
+#include <pch.h>
+#include <GLEngine.h>
 
-#include <iostream>
-
-struct Vertex
-{
-    glm::vec3 Position;
-    glm::vec3 Normals;
-    glm::vec3 Diffuse;
-    glm::vec2 uv;
-};
+// struct Vertex
+// {
+//     glm::vec3 Position;
+//     glm::vec3 Normals;
+//     glm::vec3 Diffuse;
+//     glm::vec2 uv;
+// };
 
 
 class Mesh
 {
 private:
-    std::vector<Vertex> m_vertices;
+    std::vector<GLEngine::Vertex> m_vertices;
     std::vector<unsigned> m_indices;
-    GLuint VBO, EBO, VAO;
+    // GLuint VBO, EBO, VAO;
+    GLEngine::VertexBuffer vBuffer;
 public:
     Mesh() = default;
-    Mesh(std::vector<Vertex>, std::vector<unsigned>);
-    void PrintMeshInfo() const;
+    Mesh(std::vector<GLEngine::Vertex>, std::vector<unsigned>);
     void initMesh();
     void Draw() const;
     ~Mesh() {}

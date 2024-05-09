@@ -2,6 +2,7 @@
 
 #include <Model.h>
 #include <string>
+#include "spdlog/spdlog.h"
 
 class ModelLoader
 {

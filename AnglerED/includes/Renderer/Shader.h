@@ -1,14 +1,10 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <pch.h>
+
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <iostream>
-#include <glm/glm.hpp>
-
-#include <spdlog/spdlog.h>
-
 
 class Shader {
    public:
