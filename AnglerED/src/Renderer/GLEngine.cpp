@@ -6,7 +6,7 @@ namespace GLEngine
     {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
-        glClearColor(0.8f, 0.1f, 0.2f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
     void GLEngine::PostFrame()
@@ -26,7 +26,7 @@ namespace GLEngine
 // GL Vertex Object
 namespace GLEngine
 {
-    int VertexBuffer::Init(std::vector<Vertex> &vertices)
+    int VertexBuffer::Init(const std::vector<Vertex> &vertices)
     {
         size = vertices.size();
 

@@ -1,8 +1,15 @@
 #include <Model.h>
 
+Model::Model()
+{
+    m_transform = glm::mat4(1.0f);
+}
+
 Model ::Model(std::vector<Mesh> mesh)
 {
     m_mesh = mesh;
+    // m_material = material;
+    // m_name = name;
 }
 
 void Model ::Draw()

@@ -1,6 +1,7 @@
 #include <ModelLoader.h>
 #include "spdlog/spdlog.h"
 #include <GLEngine.h>
+#include <GLMaterial.h>
 
 using GLEngine::Vertex;
 
@@ -57,6 +58,12 @@ Model ModelLoader ::LoadModel(std ::string path)
 
     std::vector<Mesh> meshes;
 
+    // std::vector<GLMaterial::DiffuseMaterial> mat;
+    // for (const auto& material : materials)
+    // {
+        
+    // }
+
     for (const auto &shape : shapes)
     {
         size_t index_offset = 0;
@@ -68,6 +75,7 @@ Model ModelLoader ::LoadModel(std ::string path)
             int fv = size_t(shape.mesh.num_face_vertices[f]); // This should be 3 since we triangulate the mesh.
             assert(fv == 3);
             Vertex vertex;
+            // vertex.mat_id = 0;
             unsigned vi; // vertex index;
 
             int mat_id = shape.mesh.material_ids[f];
@@ -75,8 +83,9 @@ Model ModelLoader ::LoadModel(std ::string path)
             {
                 tinyobj::material_t mat = materials[mat_id];
                 vertex.Diffuse = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
+                // vertex.mat_id = mat_id;
             }
-
+        
             for (size_t v = 0; v < fv; v++)
             {
                 tinyobj::index_t idx = shape.mesh.indices[index_offset + v];
@@ -108,6 +117,8 @@ Model ModelLoader ::LoadModel(std ::string path)
             indices.push_back(vi);
             index_offset += fv;
         }
+
+        spdlog::info("Vertex count for {} is {}", shape.name, vertices.size());
 
         meshes.push_back(Mesh(vertices, indices));
     }

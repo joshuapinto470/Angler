@@ -3,6 +3,7 @@
 #include <pch.h>
 #include <GLEngine.h>
 #include <Model.h>
+#include <Renderer.h>
 
 namespace SceneManager
 {
@@ -10,8 +11,13 @@ namespace SceneManager
     {
     private:
         std::vector<Model>* p_modelObjects;
+        // std::vector<Camera>* p_cameras;
+        // std::vector<Lights>* p_lights;
+
+        GLRenderer::Renderer m_renderer;
     public:
-        SceneManager(/* args */) : p_modelObjects(nullptr) {};
+        SceneManager() : p_modelObjects(nullptr) {};
         ~SceneManager();
+        void Render();
     };
 } // namespace SceneManager

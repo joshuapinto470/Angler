@@ -5,15 +5,21 @@
 #include <GLEngine.h>
 #include <Shader.h>
 
-namespace Renderer
+/*
+renderer should take the scene information
+vao, shader id, material info, lighting info, camera etc
+*/
+
+namespace GLRenderer
 {
     class Renderer
     {
     public:
         void Draw();
+        void PrepareShader();
 
     private:
-        std::vector<Shader> m_shaders;
-        std::vector<GLEngine::VertexBuffer> m_MeshObjects;
+        GLuint programID; // currently bound shader
+        std::vector<GLEngine::VertexBuffer> m_meshObjects;
     };
 } // namespace Renderer

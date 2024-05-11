@@ -10,4 +10,9 @@ namespace SceneManager
             p_modelObjects = nullptr;
         }
     }
+
+    void SceneManager::Render()
+    {
+        
+    }
 } // namespace SceneManager

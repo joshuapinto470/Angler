@@ -11,18 +11,23 @@
 //     glm::vec2 uv;
 // };
 
+struct MeshData
+{
+    std::vector<GLEngine::Vertex> m_vertices;
+    std::vector<unsigned> m_indices;
+};
 
 class Mesh
 {
 private:
-    std::vector<GLEngine::Vertex> m_vertices;
-    std::vector<unsigned> m_indices;
-    // GLuint VBO, EBO, VAO;
+    MeshData* m_mesh;
+    glm::mat4 m_transform;
+
     GLEngine::VertexBuffer vBuffer;
 public:
     Mesh() = default;
     Mesh(std::vector<GLEngine::Vertex>, std::vector<unsigned>);
     void initMesh();
     void Draw() const;
-    ~Mesh() {}
+    ~Mesh();
 };

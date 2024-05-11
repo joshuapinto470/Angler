@@ -23,7 +23,7 @@ namespace GLEngine
     public:
         VertexBuffer() : VBO(0), VAO(0), size(0) {}
         // ~VertexBuffer();
-        int Init(std::vector<Vertex> &);
+        int Init(const std::vector<Vertex> &);
         void Render() const;
         void Destroy();
         void Bind() const;

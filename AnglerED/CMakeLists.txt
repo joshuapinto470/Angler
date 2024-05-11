@@ -28,16 +28,17 @@ add_subdirectory(vendor/GLFW/)
 
 SET(SRC_FILES 
 src/main.cpp
+src/glad.c
 src/AnglerED.cpp
 src/scenes.cpp
 src/obj2angler.cpp
-src/ModelLoader.cpp
-src/Model.cpp
-src/Mesh.cpp
-src/glad.c
 src/Application.cpp
+src/SceneManager/ModelLoader.cpp
+src/SceneManager/Model.cpp
+src/SceneManager/Mesh.cpp
 src/Renderer/Shader.cpp
 src/Renderer/GLEngine.cpp
+src/Renderer/Renderer.cpp
 src/WindowManager/WindowManager.cpp
 src/imgui/imgui.cpp
 src/imgui/imgui_demo.cpp

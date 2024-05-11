@@ -18,27 +18,30 @@ void App::Loop()
     ModelLoader loader;
     Model mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/simple.obj");
     mModel.initModel();
+
     Shader shader("/home/joshua/Projects/Angler/res/base.vert", "/home/joshua/Projects/Angler/res/base.frag");
     shader.use();
 
+    glm::mat4 model = glm::mat4(1.0f);
+
+    // Camera
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)1280 / (float)720, 0.1f, 100.0f);
-    shader.setMat4("projection", projection);
 
     glm::mat4 view;
     view = glm::lookAt(glm::vec3(0.0f, 2.0f, 5.0f),
                        glm::vec3(0.0f, 0.0f, 0.0f),
                        glm::vec3(0.0f, 1.0f, 0.0f));
 
+    shader.setMat4("model", model);
     shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
 
-    glm::mat4 model = glm::mat4(1.0f);
-
+    /* Lighting info */
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-    shader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
     shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
     shader.setVec3("lightPos", lightPos);
-    shader.setMat4("model", model);
+    
 
     while (!window.CloseWindow())
     {
