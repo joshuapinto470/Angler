@@ -4,6 +4,7 @@
 namespace UIEngine
 {
 
+    // Viewport widget
     ViewportWidget::ViewportWidget(std::string title)
     {
         m_uiTitle = title;
@@ -16,17 +17,19 @@ namespace UIEngine
         ImGui::End();
     }
 
+    // Settings widget
+    WSettings::WSettings(std::string title)
+    {
+        m_uiTitle = title;
+    }
+
     void WSettings::Render()
     {
         ImGui::Begin(m_uiTitle.c_str());
         ImGui::End();
     }
 
-    WSettings::WSettings(std::string title)
-    {
-        m_uiTitle = title;
-    }
-
+    // Info Widget
     WInfo::WInfo(std::string title)
     {
         m_uiTitle = title;
@@ -34,6 +37,7 @@ namespace UIEngine
 
     void WInfo::Render()
     {
-
+        ImGui::Begin(m_uiTitle.c_str());
+        ImGui::End();
     }
 } // namespace UIEngine

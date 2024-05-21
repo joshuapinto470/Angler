@@ -58,6 +58,6 @@ void App::Loop()
         // Render widgets
         wg.Render();
         ui.EndUI();
-        window.PrepareNextFrame(); /* This swaps the buffers and polls for IO events.*/
+        window.PrepareNextFrame();
     }
 }
