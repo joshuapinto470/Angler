@@ -4,16 +4,8 @@
 
 namespace GLMaterial
 {
-    class DiffuseMaterial
+    struct DiffuseMaterial
     {
-    private:
 
-        glm::vec3 diffuse;
-
-    public:
-        void use(Shader& shader);
-        void updateCamera();
-        void updateLighting();
     };
-
 } // namespace GLMaterial

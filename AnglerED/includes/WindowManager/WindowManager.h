@@ -5,6 +5,9 @@ namespace jWindowManager
 {
     class IWindow
     {
+    public:
+        virtual void *getWindowCtx() = 0;
+
     protected:
         unsigned WIDTH, HEIGHT;
         std::string Title;
@@ -21,6 +24,7 @@ namespace jWindowManager
 
         int Init(unsigned, unsigned, const char *);
         void SetScreenDim(unsigned, unsigned);
+        void* getWindowCtx() override;
         vec2u GetScreenDim();
         int CloseWindow();
         void PrepareNextFrame();

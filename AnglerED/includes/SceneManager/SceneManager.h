@@ -2,22 +2,36 @@
 
 #include <pch.h>
 #include <GLEngine.h>
-#include <Model.h>
+#include <GLModel.h>
 #include <Renderer.h>
+#include <GLLight.h>
+#include <GLCamera.h>
+
+#include <DataStructures.h>
 
 namespace SceneManager
 {
+    class SceneGraph
+    {
+      private:
+        // The root node of the scene graph.
+        DS::Node<int> *m_node;
+        DS::Node<int> m_camRef;
+    };
+
     class SceneManager
     {
-    private:
-        std::vector<Model>* p_modelObjects;
-        // std::vector<Camera>* p_cameras;
-        // std::vector<Lights>* p_lights;
-
+      private:
+        SceneGraph m_sceneGraph;
         GLRenderer::Renderer m_renderer;
-    public:
-        SceneManager() : p_modelObjects(nullptr) {};
+
+      public:
+        SceneManager();
         ~SceneManager();
         void Render();
+        void Add(Model &);
+        void Add(GLEngine::Camera &);
+        void Add(GLEngine::Light &);
     };
+
 } // namespace SceneManager

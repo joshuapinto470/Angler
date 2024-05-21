@@ -6,5 +6,10 @@ namespace GLRenderer
     {
         
     }
+
+    void Renderer::PrepareShader()
+    {
+      
+    }
     
 } // namespace GLRenderer

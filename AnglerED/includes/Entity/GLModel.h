@@ -1,8 +1,9 @@
 #pragma once
 
-#include <Mesh.h>
+#include <GLMesh.h>
 #include <GLMaterial.h>
 
+/* 144 bytes */
 class Model
 {
 private:

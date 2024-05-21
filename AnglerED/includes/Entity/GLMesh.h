@@ -20,7 +20,7 @@ struct MeshData
 class Mesh
 {
 private:
-    MeshData* m_mesh;
+    std::shared_ptr<MeshData> m_mesh;
     glm::mat4 m_transform;
 
     GLEngine::VertexBuffer vBuffer;

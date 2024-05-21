@@ -4,7 +4,7 @@
 
 #include <GLEngine.h>
 #include <Shader.h>
-
+#include <GLModel.h>
 /*
 renderer should take the scene information
 vao, shader id, material info, lighting info, camera etc
@@ -14,12 +14,11 @@ namespace GLRenderer
 {
     class Renderer
     {
-    public:
+      public:
         void Draw();
         void PrepareShader();
-
-    private:
+      private:
         GLuint programID; // currently bound shader
         std::vector<GLEngine::VertexBuffer> m_meshObjects;
     };
-} // namespace Renderer
+} // namespace GLRenderer

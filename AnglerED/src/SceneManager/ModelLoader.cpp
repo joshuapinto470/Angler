@@ -57,18 +57,15 @@ Model ModelLoader ::LoadModel(std ::string path)
     auto &materials = reader.GetMaterials();
 
     std::vector<Mesh> meshes;
-
-    // std::vector<GLMaterial::DiffuseMaterial> mat;
-    // for (const auto& material : materials)
-    // {
-        
-    // }
+    meshes.reserve(shapes.size());
 
     for (const auto &shape : shapes)
     {
         size_t index_offset = 0;
         std::vector<Vertex> vertices;
         std::vector<unsigned> indices;
+
+        vertices.reserve(shape.mesh.num_face_vertices.size() * 3);
 
         for (size_t f = 0; f < shape.mesh.num_face_vertices.size(); f++)
         {
@@ -118,9 +115,7 @@ Model ModelLoader ::LoadModel(std ::string path)
             index_offset += fv;
         }
 
-        spdlog::info("Vertex count for {} is {}", shape.name, vertices.size());
-
-        meshes.push_back(Mesh(vertices, indices));
+        meshes.emplace_back(vertices, indices);
     }
     return Model(meshes);
 }

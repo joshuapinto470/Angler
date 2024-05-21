@@ -8,7 +8,7 @@ bool BindImageTexture(float *, GLuint *, int, int);
 
 #include "scenes.h"
 
-#include <Model.h>
+#include <GLModel.h>
 #include <ModelLoader.h>
 #include <Shader.h>
 

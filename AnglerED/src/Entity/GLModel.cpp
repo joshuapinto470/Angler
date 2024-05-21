@@ -1,18 +1,16 @@
-#include <Model.h>
+#include <GLModel.h>
 
 Model::Model()
 {
     m_transform = glm::mat4(1.0f);
 }
 
-Model ::Model(std::vector<Mesh> mesh)
+Model::Model(std::vector<Mesh> mesh)
 {
     m_mesh = mesh;
-    // m_material = material;
-    // m_name = name;
 }
 
-void Model ::Draw()
+void Model::Draw()
 {
     for (const auto &mesh : m_mesh)
     {

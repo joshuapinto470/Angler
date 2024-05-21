@@ -33,8 +33,6 @@ namespace jWindowManager
         WIDTH = WIDTH;
         Title = title;
 
-        const char *glsl_ver = "#version 130";
-
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
         glfwWindowHint(GLFW_SAMPLES, 4); // MSAA
@@ -78,6 +76,11 @@ namespace jWindowManager
     {
         glfwSwapBuffers(m_window);
         glfwPollEvents();
+    }
+
+    void* WindowManager::getWindowCtx()
+    {
+        return m_window;
     }
 
 } // namespace jWindowManager

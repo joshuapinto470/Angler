@@ -1,9 +1,8 @@
-#include <Mesh.h>
-#include <iostream>
+#include <GLMesh.h>
 
 Mesh::Mesh(std::vector<GLEngine::Vertex> vertices, std::vector<unsigned> indices)
 {
-    m_mesh = new MeshData();
+    m_mesh = std::make_shared<MeshData>();
     m_mesh->m_vertices = vertices;
     m_mesh->m_indices = indices;
 
@@ -24,9 +23,4 @@ void Mesh::initMesh()
 
 Mesh::~Mesh()
 {
-    if (!m_mesh)
-        delete m_mesh;
-    m_mesh = nullptr;
-    // vBuffer.Destroy();
-    // also free GPU memory maybe?
 }
