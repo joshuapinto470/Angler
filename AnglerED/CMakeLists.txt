@@ -28,6 +28,7 @@ SET(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 SET(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 SET(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(vendor/GLFW/)
+add_subdirectory(vendor/EnTT/)
 
 SET(SRC_FILES 
 src/main.cpp
@@ -46,6 +47,7 @@ src/Renderer/Shader.cpp
 src/Renderer/GLEngine.cpp
 src/Renderer/Renderer.cpp
 src/Renderer/UIEngine.cpp
+src/Renderer/GLMaterial.cpp
 src/WindowManager/WindowManager.cpp
 src/imgui/imgui.cpp
 src/imgui/imgui_demo.cpp
@@ -63,9 +65,9 @@ ${SRC_FILES}
 )
 
 if(WIN32)
-        target_link_libraries(AnglerED PRIVATE AnglerRT spdlog glfw opengl32)
+        target_link_libraries(AnglerED PRIVATE AnglerRT spdlog glfw opengl32 EnTT)
 endif(WIN32)
 
 if(UNIX)
-        target_link_libraries(AnglerED PRIVATE AnglerRT spdlog glfw GL)
+        target_link_libraries(AnglerED PRIVATE AnglerRT spdlog glfw GL EnTT)
 endif(UNIX)

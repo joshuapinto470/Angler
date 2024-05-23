@@ -30,6 +30,8 @@ namespace UIEngine
             io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         ImGui::StyleColorsDark();
 
+        io.Fonts->AddFontFromFileTTF("/home/joshua/Projects/Angler/res/fonts/Roboto-Medium.ttf", 14);
+
         ImGui_ImplGlfw_InitForOpenGL((GLFWwindow *)window.getWindowCtx(), true);
         ImGui_ImplOpenGL3_Init(glsl_version);
     }
@@ -39,6 +41,8 @@ namespace UIEngine
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        if (m_docking)
+            ImGui::DockSpaceOverViewport();
     }
 
     void UIEngine::EndUI()

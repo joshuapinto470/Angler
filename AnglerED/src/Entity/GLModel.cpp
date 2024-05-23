@@ -1,10 +1,5 @@
 #include <GLModel.h>
 
-Model::Model()
-{
-    m_transform = glm::mat4(1.0f);
-}
-
 Model::Model(std::vector<Mesh> mesh)
 {
     m_mesh = mesh;

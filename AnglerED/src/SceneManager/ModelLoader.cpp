@@ -2,8 +2,9 @@
 #include "spdlog/spdlog.h"
 #include <GLEngine.h>
 #include <GLMaterial.h>
+#include <DataStructures.h>
 
-using GLEngine::Vertex;
+using DS::Vertex;
 
 #ifndef USE_ASSIMP
 // Load TinyObjLoader if Assimp is not used.

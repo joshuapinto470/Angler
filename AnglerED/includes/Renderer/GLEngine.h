@@ -1,19 +1,12 @@
 #pragma once
 
 #include <pch.h>
+#include <DataStructures.h>
 
 // The OpenGL render context
 
 namespace GLEngine
 {
-    struct Vertex
-    {
-        glm::vec3 Position;
-        glm::vec3 Normals;
-        glm::vec3 Diffuse;
-        glm::vec2 uv;
-    };
-
     class VertexBuffer
     {
       private:
@@ -25,7 +18,7 @@ namespace GLEngine
         {
         }
         // ~VertexBuffer();
-        int Init(const std::vector<Vertex> &);
+        int Init(const std::vector<DS::Vertex> &);
         void Render() const;
         void Destroy();
         void Bind() const;

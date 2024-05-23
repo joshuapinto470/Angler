@@ -8,15 +8,20 @@
 #include <GLCamera.h>
 
 #include <DataStructures.h>
+#include <GLEntity.h>
+
+#include <entt/entity/registry.hpp>
 
 namespace SceneManager
 {
     class SceneGraph
     {
+      public:
+        DS::ENode *getRootNode();
+
       private:
         // The root node of the scene graph.
-        DS::Node<int> *m_node;
-        DS::Node<int> m_camRef;
+        DS::ENode *m_node;
     };
 
     class SceneManager
@@ -24,14 +29,15 @@ namespace SceneManager
       private:
         SceneGraph m_sceneGraph;
         GLRenderer::Renderer m_renderer;
+        entt::registry m_registry;
 
       public:
         SceneManager();
         ~SceneManager();
         void Render();
-        void Add(Model &);
+        void Add(Model &, DS::ENode*);
+        void Add(GLEngine::Light &, DS::ENode*);
         void Add(GLEngine::Camera &);
-        void Add(GLEngine::Light &);
     };
 
 } // namespace SceneManager

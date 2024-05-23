@@ -1,4 +1,8 @@
 #include <GLEngine.h>
+#include <DataStructures.h>
+
+
+using DS::Vertex;
 
 namespace GLEngine
 {

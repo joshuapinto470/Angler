@@ -38,6 +38,7 @@ namespace UIEngine
     void WInfo::Render()
     {
         ImGui::Begin(m_uiTitle.c_str());
+        ImGui::ShowDemoWindow();
         ImGui::End();
     }
 } // namespace UIEngine

@@ -3,7 +3,7 @@
 App::App()
 {
     engine = GLEngine::GLEngine();
-    ui = UIEngine::UIEngine(false); // docking false
+    ui = UIEngine::UIEngine(true); // docking false
     window = jWindowManager::WindowManager();
 }
 
@@ -25,7 +25,8 @@ void App::Loop()
     Model mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/simple.obj");
     mModel.initModel();
 
-    UIEngine::ViewportWidget wg = UIEngine::ViewportWidget("blah blah... ");
+    UIEngine::ViewportWidget wg = UIEngine::ViewportWidget("Viewport");
+    UIEngine::WInfo demo = UIEngine::WInfo("Demo");
 
     Shader shader("/home/joshua/Projects/Angler/res/base.vert", "/home/joshua/Projects/Angler/res/base.frag");
     shader.use();
@@ -57,6 +58,7 @@ void App::Loop()
         ui.StartUI();
         // Render widgets
         wg.Render();
+        demo.Render();
         ui.EndUI();
         window.PrepareNextFrame();
     }
