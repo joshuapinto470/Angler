@@ -38,6 +38,8 @@ namespace GLEngine
         void Init(unsigned, unsigned);
         void Bind() const;
         void Unbind() const;
+        void Clear() const;
+        void RescaleBuffer(float, float);
         GLuint getTexture() {return m_texture;};
     };
 

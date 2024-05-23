@@ -25,7 +25,9 @@ void App::Loop()
     Model mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/simple.obj");
     mModel.initModel();
 
-    UIEngine::ViewportWidget wg = UIEngine::ViewportWidget("Viewport");
+    UIEngine::ViewportWidget viewport = UIEngine::ViewportWidget("Viewport");
+    viewport.SetScene(&mModel);
+
     UIEngine::WInfo demo = UIEngine::WInfo("Demo");
 
     Shader shader("/home/joshua/Projects/Angler/res/base.vert", "/home/joshua/Projects/Angler/res/base.frag");
@@ -39,7 +41,6 @@ void App::Loop()
     glm::mat4 view;
     view = glm::lookAt(glm::vec3(0.0f, 2.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    shader.setMat4("model", model);
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
 
@@ -51,14 +52,17 @@ void App::Loop()
 
     while (!window.CloseWindow())
     {
+        model = glm::rotate(model, glm::radians(0.15f), glm::vec3(0.f, 1.f, 0.f));
+        shader.setMat4("model", model);
         engine.PreFrame();
         // Render stuff here.
-        mModel.Draw();
+        // mModel.Draw();
 
         ui.StartUI();
         // Render widgets
-        wg.Render();
+        viewport.Render();
         demo.Render();
+        
         ui.EndUI();
         window.PrepareNextFrame();
     }

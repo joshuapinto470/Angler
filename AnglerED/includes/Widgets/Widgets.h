@@ -1,6 +1,9 @@
 #pragma once
 
 #include <UIEngine.h>
+#include <GLEngine.h>
+
+#include <GLModel.h>
 
 namespace UIEngine
 {
@@ -10,8 +13,12 @@ namespace UIEngine
 
     class ViewportWidget : public UIWidget
     {
+      private:
+        Model *m_Model;
+        GLEngine::FrameBuffer framebuffer;
       public:
         ViewportWidget(std::string);
+        void SetScene(Model *);
         void Render() override;
     };
 
