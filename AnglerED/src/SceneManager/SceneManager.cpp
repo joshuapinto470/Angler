@@ -8,6 +8,8 @@ namespace SceneManager
 
     SceneManager::SceneManager()
     {
+        m_currSelected = nullptr;
+        name = "Scene 1";
     }
 
     SceneManager::~SceneManager()
@@ -32,7 +34,7 @@ namespace SceneManager
             if (renderer)
                 renderer->Render();
 
-            for (const auto& c : node->getChildren())
+            for (const auto &c : node->getChildren())
             {
                 stack.push_back(c);
             }
@@ -79,6 +81,5 @@ namespace SceneManager
 
     SceneGraph::~SceneGraph()
     {
-        
     }
 } // namespace SceneManager

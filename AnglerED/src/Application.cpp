@@ -33,6 +33,10 @@ void App::Loop()
     viewport.SetScene(manager);
 
     UIEngine::WInfo demo = UIEngine::WInfo("Demo");
+    UIEngine::WSceneViewer viewer = UIEngine::WSceneViewer("Scene hierarchy");
+    viewer.SetScene(manager);
+
+    UIEngine::WSettings setting = UIEngine::WSettings("Component");
 
     Shader shader("/home/joshua/Projects/Angler/res/base.vert", "/home/joshua/Projects/Angler/res/base.frag");
     shader.use();
@@ -66,6 +70,8 @@ void App::Loop()
         // Render widgets
         viewport.Render();
         demo.Render();
+        viewer.Render();
+        setting.Render();
 
         ui.EndUI();
         window.PrepareNextFrame();

@@ -33,13 +33,23 @@ namespace SceneManager
         GLRenderer::Renderer m_renderer;
         entt::registry m_registry;
 
+        // Scene state
+        DS::ENode* m_currSelected;
+
+        std::string name;
+
       public:
         SceneManager();
         ~SceneManager();
         void Render();
-        void Add(Model &, DS::ENode*);
-        void Add(GLEngine::Light &, DS::ENode*);
+        void Add(Model &, DS::ENode *);
+        void Add(GLEngine::Light &, DS::ENode *);
         void Add(GLEngine::Camera &);
+
+        DS::ENode *getRootNode()
+        {
+            return m_sceneGraph.getRootNode();
+        };
     };
 
 } // namespace SceneManager
