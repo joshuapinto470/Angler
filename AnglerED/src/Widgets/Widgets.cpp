@@ -56,8 +56,29 @@ namespace UIEngine
     void WSettings::Render()
     {
         ImGui::Begin(m_uiTitle.c_str());
-        WTransform();
+        if (!m_scene)
+        {
+            ImGui::Text("%s", "No scene set");
+            ImGui::End();
+            return;
+        }
+        DS::ENode *node = m_scene->getActiveNode();
+        if (node == nullptr)
+        {
+            ImGui::Text("%s", "No active node set");
+            ImGui::End();
+            return;
+        }
+        ImGui::Text("%s", node->getName().c_str());
+        ImGui::Separator();
+        DS::Transform *t = m_scene->getComponent<DS::Transform>(node);
+        WTransform(t);
         ImGui::End();
+    }
+
+    void WSettings::SetScene(SceneManager::SceneManager *scene)
+    {
+        m_scene = scene;
     }
 
     // Info Widget
@@ -79,6 +100,8 @@ namespace UIEngine
     {
         m_uiTitle = name;
         m_scene = nullptr;
+
+        flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
     }
 
     void WSceneViewer::SetScene(SceneManager::SceneManager *scene)
@@ -86,10 +109,21 @@ namespace UIEngine
         m_scene = scene;
     }
 
-    void WSceneViewer::Draw(const DS::ENode *node)
+    void WSceneViewer::Draw(DS::ENode *node)
     {
-        if (ImGui::TreeNode((void *)node, "%s", node->getName().c_str()))
+        ImGuiTreeNodeFlags node_flags = flags;
+        if (m_scene->getActiveNode() == node)
         {
+            node_flags |= ImGuiTreeNodeFlags_Selected;
+        }
+        if (ImGui::TreeNodeEx((void *)node, node_flags, "%s", node->getName().c_str()))
+        {
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+            {
+                // node_clicked = node;
+                m_scene->setActiveNode(node);
+            }
+
             if (node->isLeaf())
             {
                 ImGui::Text("Leaf");
@@ -118,13 +152,22 @@ namespace UIEngine
         ImGui::End();
     }
 
-    void WTransform()
+    void WTransform(DS::Transform *transform)
     {
-        glm::vec3 x(1.0f);
+        if (!transform)
+            return;
 
-        DrawVec3Controls("Transform", x);
-        DrawVec3Controls("Rotation", x);
-        DrawVec3Controls("Scale", x);
+        glm::vec3 scale;
+        glm::quat rotation;
+        glm::vec3 translation;
+        glm::vec3 skew;
+        glm::vec4 perspective;
+        glm::decompose(transform->transform, scale, rotation, translation, skew, perspective);
+        glm::vec3 angle = glm::eulerAngles(rotation);
+
+        DrawVec3Controls("Position", translation);
+        DrawVec3Controls("Rotation", angle);
+        DrawVec3Controls("Scale", scale);
     }
 
     static void DrawVec3Controls(const std::string &label, glm::vec3 value)

@@ -8,12 +8,22 @@ namespace SceneManager
 
     SceneManager::SceneManager()
     {
-        m_currSelected = nullptr;
+        m_currActive = nullptr;
         name = "Scene 1";
     }
 
     SceneManager::~SceneManager()
     {
+    }
+
+    void SceneManager::setActiveNode(DS::ENode* node)
+    {
+        m_currActive = node;
+    }
+
+    DS::ENode* SceneManager::getActiveNode()
+    {
+        return m_currActive;
     }
 
     void SceneManager::Render()

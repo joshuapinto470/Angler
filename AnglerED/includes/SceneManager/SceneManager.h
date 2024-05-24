@@ -34,7 +34,7 @@ namespace SceneManager
         entt::registry m_registry;
 
         // Scene state
-        DS::ENode* m_currSelected;
+        DS::ENode *m_currActive;
 
         std::string name;
 
@@ -45,11 +45,20 @@ namespace SceneManager
         void Add(Model &, DS::ENode *);
         void Add(GLEngine::Light &, DS::ENode *);
         void Add(GLEngine::Camera &);
+        void setActiveNode(DS::ENode *);
+        DS::ENode *getActiveNode();
 
         DS::ENode *getRootNode()
         {
             return m_sceneGraph.getRootNode();
         };
+
+        template <class T> T *getComponent(DS::ENode *e)
+        {
+            if (!e)
+                return nullptr;
+            return m_registry.try_get<T>(e->getEntity());
+        }
     };
 
 } // namespace SceneManager

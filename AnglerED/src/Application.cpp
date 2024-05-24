@@ -37,6 +37,7 @@ void App::Loop()
     viewer.SetScene(manager);
 
     UIEngine::WSettings setting = UIEngine::WSettings("Component");
+    setting.SetScene(manager);
 
     Shader shader("/home/joshua/Projects/Angler/res/base.vert", "/home/joshua/Projects/Angler/res/base.frag");
     shader.use();
@@ -64,7 +65,6 @@ void App::Loop()
         shader.setMat4("model", model);
         engine.PreFrame();
         // Render stuff here.
-        // mModel.Draw();
 
         ui.StartUI();
         // Render widgets

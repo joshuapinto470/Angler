@@ -5,13 +5,12 @@
 
 #include <GLModel.h>
 #include <SceneManager.h>
+#include <DataStructures.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace UIEngine
 {
-    class Transform : public UIWidget
-    {
-    };
-
     class ViewportWidget : public UIWidget
     {
       private:
@@ -27,8 +26,9 @@ namespace UIEngine
     class WSceneViewer : public UIWidget
     {
       private:
+        ImGuiTreeNodeFlags flags;
         SceneManager::SceneManager *m_scene;
-        void Draw(const DS::ENode *);
+        void Draw(DS::ENode *);
 
       public:
         WSceneViewer(std::string);
@@ -38,8 +38,12 @@ namespace UIEngine
 
     class WSettings : public UIWidget
     {
+      private:
+        SceneManager::SceneManager *m_scene;
+
       public:
         WSettings(std::string);
+        void SetScene(SceneManager::SceneManager *);
         void Render() override;
     };
 
@@ -51,6 +55,6 @@ namespace UIEngine
     };
 
     // Renders the transform component.
-    void WTransform();
+    void WTransform(DS::Transform *);
     static void DrawVec3Controls(const std::string &, glm::vec3);
 } // namespace UIEngine

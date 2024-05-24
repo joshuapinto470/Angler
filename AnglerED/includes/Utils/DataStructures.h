@@ -8,6 +8,7 @@ FLAG = 0000 0000
 dirty  1000 0000
 static 0100 0000
 hidden 0010 0000
+active 0001 0000
 flag & (1 << 7);
 */
 
@@ -116,6 +117,7 @@ namespace DS
     struct Transform
     {
         glm::mat4 transform;
+        Transform() : transform(1.0f) {};
     };
 
 } // namespace DS
