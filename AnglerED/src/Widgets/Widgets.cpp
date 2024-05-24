@@ -13,15 +13,21 @@ namespace UIEngine
 
     // This should be a scene
     // this is just for testing for now.
-    void ViewportWidget::SetScene(Model *model)
+    void ViewportWidget::SetScene(SceneManager::SceneManager *scene)
     {
-        m_Model = model;
+        m_scene = scene;
     }
 
     void ViewportWidget::Render()
     {
 
         ImGui::Begin(m_uiTitle.c_str());
+        if (!m_scene)
+        {
+            ImGui::Text("No scene selected");
+            ImGui::End();
+            return;
+        }
 
         float w = ImGui::GetContentRegionAvail().x;
         float h = ImGui::GetContentRegionAvail().y;
@@ -37,7 +43,7 @@ namespace UIEngine
 
         framebuffer.Clear();
         framebuffer.Bind();
-        m_Model->Draw();
+        m_scene->Render();
         framebuffer.Unbind();
     }
 
@@ -61,8 +67,8 @@ namespace UIEngine
 
     void WInfo::Render()
     {
-        ImGui::Begin(m_uiTitle.c_str());
+        // ImGui::Begin(m_uiTitle.c_str());
         ImGui::ShowDemoWindow();
-        ImGui::End();
+        // ImGui::End();
     }
 } // namespace UIEngine

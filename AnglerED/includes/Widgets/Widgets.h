@@ -4,6 +4,7 @@
 #include <GLEngine.h>
 
 #include <GLModel.h>
+#include <SceneManager.h>
 
 namespace UIEngine
 {
@@ -14,11 +15,11 @@ namespace UIEngine
     class ViewportWidget : public UIWidget
     {
       private:
-        Model *m_Model;
+        SceneManager::SceneManager *m_scene;
         GLEngine::FrameBuffer framebuffer;
       public:
         ViewportWidget(std::string);
-        void SetScene(Model *);
+        void SetScene(SceneManager::SceneManager *);
         void Render() override;
     };
 

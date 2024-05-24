@@ -1,22 +1,22 @@
 #include <GLModel.h>
 
-Model::Model(std::vector<Mesh> mesh)
+Model::Model(MeshFilter mesh, GLMaterial::Material material)
+{
+    m_mesh = mesh;
+    m_material = material;
+}
+
+Model::Model(MeshFilter mesh)
 {
     m_mesh = mesh;
 }
 
-void Model::Draw()
+GLMaterial::Material Model::getMaterial()
 {
-    for (const auto &mesh : m_mesh)
-    {
-        mesh.Draw();
-    }
+    return m_material;
 }
 
-void Model::initModel()
+MeshFilter Model::getMesh()
 {
-    for (int i = 0; i < m_mesh.size(); i++)
-    {
-        m_mesh[i].initMesh();
-    }
+    return m_mesh;
 }

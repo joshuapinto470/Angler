@@ -57,7 +57,10 @@ Model ModelLoader ::LoadModel(std ::string path)
     auto &shapes = reader.GetShapes();
     auto &materials = reader.GetMaterials();
 
-    std::vector<Mesh> meshes;
+    MeshFilter meshRef;
+
+    std::vector<GLMesh> meshes;
+
     meshes.reserve(shapes.size());
 
     for (const auto &shape : shapes)
@@ -116,8 +119,20 @@ Model ModelLoader ::LoadModel(std ::string path)
             index_offset += fv;
         }
 
-        meshes.emplace_back(vertices, indices);
+        std::shared_ptr<MeshData> data = std::make_shared<MeshData>();
+        data->m_vertices = vertices;
+        data->m_indices = indices;
+
+        GLMesh M;
+        M.m_mesh = data;
+        M.m_name = shape.name;
+
+        meshes.push_back(M);
     }
-    return Model(meshes);
+
+    MeshFilter model;
+    model.m_meshes = meshes;
+
+    return Model(model);
 }
 #endif

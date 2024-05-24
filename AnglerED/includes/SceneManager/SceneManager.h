@@ -17,6 +17,8 @@ namespace SceneManager
     class SceneGraph
     {
       public:
+        SceneGraph();
+        ~SceneGraph();
         DS::ENode *getRootNode();
 
       private:

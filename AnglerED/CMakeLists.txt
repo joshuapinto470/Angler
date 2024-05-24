@@ -39,10 +39,12 @@ src/obj2angler.cpp
 src/Widgets/Widgets.cpp
 src/Application.cpp
 src/SceneManager/ModelLoader.cpp
+src/SceneManager/SceneManager.cpp
 src/Entity/GLModel.cpp
 src/Entity/GLMesh.cpp
 src/Entity/GLCamera.cpp
 src/Entity/GLLight.cpp
+src/Entity/GLEntity.cpp
 src/Renderer/Shader.cpp
 src/Renderer/GLEngine.cpp
 src/Renderer/Renderer.cpp

@@ -1,5 +1,7 @@
 #include <Application.h>
 
+#include <SceneManager.h>
+
 App::App()
 {
     engine = GLEngine::GLEngine();
@@ -23,10 +25,12 @@ void App::Loop()
 {
     ModelLoader loader;
     Model mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/simple.obj");
-    mModel.initModel();
+
+    SceneManager::SceneManager* manager = new SceneManager::SceneManager();
+    manager->Add(mModel, nullptr);
 
     UIEngine::ViewportWidget viewport = UIEngine::ViewportWidget("Viewport");
-    viewport.SetScene(&mModel);
+    viewport.SetScene(manager);
 
     UIEngine::WInfo demo = UIEngine::WInfo("Demo");
 
@@ -62,7 +66,7 @@ void App::Loop()
         // Render widgets
         viewport.Render();
         demo.Render();
-        
+
         ui.EndUI();
         window.PrepareNextFrame();
     }

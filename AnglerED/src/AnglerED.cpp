@@ -257,8 +257,8 @@ void AnglerED ::DrawRenderWindow()
 
 void AnglerED ::Loop()
 {
-
-    mModel.initModel();
+    /*
+    // mModel.initModel();
     Shader shader("/home/joshua/Projects/Angler/res/base.vert", "/home/joshua/Projects/Angler/res/base.frag");
     shader.use();
 
@@ -292,7 +292,7 @@ void AnglerED ::Loop()
         shader.setMat4("model", model);
 
 
-        mModel.Draw();
+        // mModel.Draw();
         RenderImGUI();
 
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
@@ -301,6 +301,7 @@ void AnglerED ::Loop()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+    */
 }
 
 void AnglerED::RenderImGUI()
@@ -353,7 +354,7 @@ bool BindImageTexture(float *buffer, GLuint *out_texture, int image_width, int i
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                    GL_CLAMP_TO_EDGE);                                   // This is required on WebGL for non power-of-two textures
+                    GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
 
     // Upload pixels into texture

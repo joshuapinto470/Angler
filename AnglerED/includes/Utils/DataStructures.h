@@ -5,8 +5,9 @@
 
 /*
 FLAG = 0000 0000
-dirty  1000 0000 
+dirty  1000 0000
 static 0100 0000
+hidden 0010 0000
 flag & (1 << 7);
 */
 
@@ -29,22 +30,24 @@ namespace DS
         const Node<T> *getParent() const;
         const T &getEntity() const;
         T &getEntity();
+        std::string getName() const;
+        void setName(std::string &name);
 
         void addChild(Node<T> *);
-        bool isLeaf() { return m_children.size() == 0; };
+        bool isLeaf() const;
     };
 
     template <typename T> Node<T>::Node()
     {
         m_parent = nullptr;
-        m_children = std::vector<T>();
+        // m_children = std::vector<T>();
         name = "Untitled";
     }
 
     template <typename T> inline Node<T>::Node(T e)
     {
         m_parent = nullptr;
-        m_children = std::vector<T>::Node();
+        // m_children = std::vector<T>();
         entity = e;
 
         name = "Untitled";
@@ -75,10 +78,25 @@ namespace DS
         return entity;
     }
 
+    template <typename T> inline std::string Node<T>::getName() const
+    {
+        return name;
+    }
+
+    template <typename T> inline void Node<T>::setName(std::string &name)
+    {
+        this->name = name;
+    }
+
     template <typename T> inline void Node<T>::addChild(Node<T> *node)
     {
         node->m_parent = this;
         m_children.push_back(node);
+    }
+
+    template <typename T> inline bool Node<T>::isLeaf() const
+    {
+        return m_children.empty();
     }
 
     typedef Node<entt::entity> ENode;
