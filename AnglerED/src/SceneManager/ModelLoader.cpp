@@ -6,16 +6,14 @@
 
 using DS::Vertex;
 
-#ifndef USE_ASSIMP
-// Load TinyObjLoader if Assimp is not used.
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+#ifdef USE_ASSIMP
+    #include <assimp/Importer.hpp>
+    #include <assimp/scene.h>
+    #include <assimp/postprocess.h>
+#elif
+    #define TINYOBJLOADER_IMPLEMENTATION
+    #include "tiny_obj_loader.h"
 #endif
-
-void printvec3(const std::string s, const tinyobj::real_t v[3])
-{
-    std::cout << s.c_str() << ": " << v[0] << ", " << v[1] << ", " << v[2] << "\n";
-}
 
 ModelLoader ::ModelLoader()
 {
@@ -26,11 +24,23 @@ ModelLoader ::~ModelLoader()
 }
 
 #ifdef USE_ASSIMP
-Model ModelLoader ::LoadModel(std ::string path)
+Model ModelLoader::LoadModel(std::string path)
 {
+    Assimp::Importer importer;
+
+    const aiScene *scene = importer.ReadFile(path, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
+                                                       aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+
+    if (nullptr == scene)
+    {
+        spdlog::warn("File Reader {}", importer.GetErrorString());
+        return Model();
+    }
+
+    return Model();
 }
 #else
-Model ModelLoader ::LoadModel(std ::string path)
+Model ModelLoader::LoadModel(std ::string path)
 {
     tinyobj::ObjReaderConfig reader_config;
     // .mtl search path same as model directory
@@ -86,7 +96,7 @@ Model ModelLoader ::LoadModel(std ::string path)
                 vertex.Diffuse = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
                 // vertex.mat_id = mat_id;
             }
-        
+
             for (size_t v = 0; v < fv; v++)
             {
                 tinyobj::index_t idx = shape.mesh.indices[index_offset + v];

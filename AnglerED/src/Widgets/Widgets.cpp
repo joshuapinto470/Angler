@@ -51,6 +51,7 @@ namespace UIEngine
     WSettings::WSettings(std::string title)
     {
         m_uiTitle = title;
+        flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
     }
 
     void WSettings::Render()
@@ -71,8 +72,20 @@ namespace UIEngine
         }
         ImGui::Text("%s", node->getName().c_str());
         ImGui::Separator();
+
         DS::Transform *t = m_scene->getComponent<DS::Transform>(node);
-        WTransform(t);
+        if (t && (ImGui::TreeNodeEx("Transform", flags, "Transform")))
+        {
+            WTransform(t);
+            ImGui::TreePop();
+        }
+
+        GLEngine::MeshRenderer *m = m_scene->getComponent<GLEngine::MeshRenderer>(node);
+        if (m && (ImGui::TreeNodeEx("_MeshRenderer", flags, "MeshRenderer")))
+        {
+            WMeshRenderer(m);
+            ImGui::TreePop();
+        }
         ImGui::End();
     }
 
@@ -111,10 +124,22 @@ namespace UIEngine
 
     void WSceneViewer::Draw(DS::ENode *node)
     {
+        if (!node)
+            return;
         ImGuiTreeNodeFlags node_flags = flags;
+        std::string name = node->getName();
         if (m_scene->getActiveNode() == node)
         {
             node_flags |= ImGuiTreeNodeFlags_Selected;
+        }
+
+        if (node->isLeaf())
+        {
+            node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+            ImGui::TreeNodeEx((void *)node, node_flags, "%s", name.c_str());
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                m_scene->setActiveNode(node);
+            return;
         }
         if (ImGui::TreeNodeEx((void *)node, node_flags, "%s", node->getName().c_str()))
         {
@@ -124,12 +149,6 @@ namespace UIEngine
                 m_scene->setActiveNode(node);
             }
 
-            if (node->isLeaf())
-            {
-                ImGui::Text("Leaf");
-                ImGui::TreePop();
-                return;
-            }
             for (const auto child : node->getChildren())
                 Draw(child);
             ImGui::TreePop();
@@ -168,6 +187,36 @@ namespace UIEngine
         DrawVec3Controls("Position", translation);
         DrawVec3Controls("Rotation", angle);
         DrawVec3Controls("Scale", scale);
+    }
+
+    void WMeshRenderer(GLEngine::MeshRenderer *m)
+    {
+        if (!m)
+            return;
+
+        std::vector<GLEngine::Material *> mat = m->getMaterial();
+
+        ImGuiTreeNodeFlags base_flags =
+            ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+        if (ImGui::TreeNodeEx("_Materials", base_flags, "Materials"))
+        {
+            if (ImGui::BeginTable("", 3))
+            {
+                for (int row = 0; row < mat.size(); row++)
+                {
+                    GLEngine::Material *_mat = mat[row];
+                    if (!_mat)
+                        continue;
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Index %d", row);
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", _mat->name.c_str());
+                }
+                ImGui::EndTable();
+            }
+            ImGui::TreePop();
+        }
     }
 
     static void DrawVec3Controls(const std::string &label, glm::vec3 value)

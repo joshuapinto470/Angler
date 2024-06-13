@@ -14,12 +14,14 @@ namespace GLEngine
     class MeshRenderer
     {
         std::vector<VertexBuffer> vbos;
-        std::vector<Material> materials;
+        std::vector<Material*> materials;
 
       public:
         MeshRenderer() = default;
         MeshRenderer(MeshFilter &);
+        MeshRenderer(MeshFilter&, std::vector<Material*>&);
 
-        void Render();
+        const std::vector<Material*>& getMaterial();
+        const std::vector<VertexBuffer>& getVbo();
     };
 } // namespace GLEngine

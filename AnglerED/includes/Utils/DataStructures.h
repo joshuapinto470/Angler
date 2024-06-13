@@ -5,21 +5,29 @@
 
 /*
 FLAG = 0000 0000
-dirty  1000 0000
-static 0100 0000
-hidden 0010 0000
-active 0001 0000
+dirty  0000 0001
+static 0000 0010
+hidden 0000 0100
+active 0000 1000
 flag & (1 << 7);
 */
 
 namespace DS
 {
+    enum NODE_FLAGS
+    {
+        DIRTY = (1 << 0),
+        STATIC = (1 << 1),
+        HIDDEN = (1 << 2),
+        ACTIVE = (1 << 3)
+    };
+
     template <typename T> class Node
     {
         std::vector<Node<T> *> m_children;
         Node<T> *m_parent;
         T entity;
-        u_int8_t flags = 0x00;
+        uint8_t flags = 0x00;
         std::string name;
 
       public:
@@ -33,10 +41,22 @@ namespace DS
         T &getEntity();
         std::string getName() const;
         void setName(std::string &name);
-
+        void setName(const char *);
+        void setFlag(NODE_FLAGS);
+        bool checkFlag(NODE_FLAGS);
         void addChild(Node<T> *);
         bool isLeaf() const;
     };
+
+    template <typename T> bool Node<T>::checkFlag(NODE_FLAGS flag)
+    {
+        return flags & flag;
+    }
+
+    template <typename T> void Node<T>::setFlag(NODE_FLAGS flag)
+    {
+        flags |= flag;
+    }
 
     template <typename T> Node<T>::Node()
     {
@@ -89,6 +109,11 @@ namespace DS
         this->name = name;
     }
 
+    template <typename T> inline void Node<T>::setName(const char *name)
+    {
+        this->name = name;
+    }
+
     template <typename T> inline void Node<T>::addChild(Node<T> *node)
     {
         node->m_parent = this;
@@ -117,7 +142,7 @@ namespace DS
     struct Transform
     {
         glm::mat4 transform;
-        Transform() : transform(1.0f) {};
+        Transform() : transform(1.0f){};
     };
 
 } // namespace DS

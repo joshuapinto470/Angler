@@ -15,6 +15,9 @@ namespace GLEngine
         
         const glm::mat4& getProjection();
         const glm::mat4& getView();
+
+        void setView(glm::mat4& view);
+        void setProjection(glm::mat4& projection);
          
     };
 } // namespace GLEngine

@@ -38,11 +38,23 @@ namespace SceneManager
             node = stack.back();
             stack.pop_back();
 
+            if (node->checkFlag(DS::NODE_FLAGS::HIDDEN))
+            {
+                continue;
+            }
+
             entt::entity e = node->getEntity();
 
             auto renderer = m_registry.try_get<MeshRenderer>(e);
-            if (renderer)
-                renderer->Render();
+            
+            if (renderer){
+                for (const auto& i : renderer->getVbo())
+                {
+                    i.Bind();
+                    i.Render();
+                    i.Unbind();
+                }
+            }
 
             for (const auto &c : node->getChildren())
             {
@@ -53,12 +65,22 @@ namespace SceneManager
 
     void SceneManager::Add(Model &model, DS::ENode *node)
     {
+        if (model.getMesh().m_meshes.empty())
+        {
+            // For now don't make a node for models with no data
+            spdlog::warn("SCENE MANAGER {}", "Model has no mesh data");
+            return;
+        }
+
+        MeshFilter mesh = model.getMesh();
+        std::vector<GLEngine::Material*> materials = model.getMaterial();
+
         const auto &entity = m_registry.create();
 
         m_registry.emplace<Transform>(entity);
-        m_registry.emplace<MeshFilter>(entity, model.getMesh());
+        m_registry.emplace<MeshFilter>(entity, mesh);
         MeshFilter m = m_registry.get<MeshFilter>(entity);
-        m_registry.emplace<MeshRenderer>(entity, m);
+        m_registry.emplace<MeshRenderer>(entity, m, materials);
 
         DS::ENode *n = new DS::ENode(entity);
         n->setName(model.getMesh().m_meshes[0].m_name);
@@ -67,8 +89,16 @@ namespace SceneManager
         _n->addChild(n);
     }
 
-    void SceneManager::Add(GLEngine::Camera &camera)
+    void SceneManager::Add(GLEngine::Camera &camera, DS::ENode *node)
     {
+        const auto &entity = m_registry.create();
+        m_registry.emplace<GLEngine::Camera>(entity, camera);
+
+        DS::ENode *n = new DS::ENode(entity);
+        n->setName("Camera");
+
+        DS::ENode *_n = node ? node : m_sceneGraph.getRootNode();
+        _n->addChild(n);
     }
 
     void SceneManager::Add(GLEngine::Light &light, DS::ENode *node)

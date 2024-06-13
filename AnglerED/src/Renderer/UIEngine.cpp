@@ -30,7 +30,7 @@ namespace UIEngine
             io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         ImGui::StyleColorsDark();
 
-        io.Fonts->AddFontFromFileTTF("/home/joshua/Projects/Angler/res/fonts/Roboto-Medium.ttf", 14);
+        io.Fonts->AddFontFromFileTTF("/home/joshua/Projects/Angler/res/fonts/Heebo-Medium.ttf", 17);
 
         ImGui_ImplGlfw_InitForOpenGL((GLFWwindow *)window.getWindowCtx(), true);
         ImGui_ImplOpenGL3_Init(glsl_version);

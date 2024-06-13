@@ -44,7 +44,7 @@ namespace SceneManager
         void Render();
         void Add(Model &, DS::ENode *);
         void Add(GLEngine::Light &, DS::ENode *);
-        void Add(GLEngine::Camera &);
+        void Add(GLEngine::Camera &, DS::ENode *);
         void setActiveNode(DS::ENode *);
         DS::ENode *getActiveNode();
 

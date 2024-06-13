@@ -4,6 +4,7 @@
 #include <GLEngine.h>
 
 #include <GLModel.h>
+#include <GLEntity.h>
 #include <SceneManager.h>
 #include <DataStructures.h>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -40,6 +41,7 @@ namespace UIEngine
     {
       private:
         SceneManager::SceneManager *m_scene;
+        ImGuiTreeNodeFlags flags;
 
       public:
         WSettings(std::string);
@@ -54,7 +56,7 @@ namespace UIEngine
         void Render() override;
     };
 
-    // Renders the transform component.
     void WTransform(DS::Transform *);
+    void WMeshRenderer(GLEngine::MeshRenderer* );
     static void DrawVec3Controls(const std::string &, glm::vec3);
 } // namespace UIEngine

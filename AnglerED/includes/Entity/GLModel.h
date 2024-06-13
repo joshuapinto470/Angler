@@ -11,13 +11,13 @@ struct MeshFilter
 class Model
 {
     MeshFilter m_mesh;
-    GLMaterial::Material m_material;
+    std::vector<GLMaterial::Material*> m_material;
 
     public:
         Model() = default;
         Model(MeshFilter);
-        Model(MeshFilter, GLMaterial::Material);
+        Model(MeshFilter, std::vector<GLMaterial::Material*>);
 
         MeshFilter getMesh();
-        GLMaterial::Material getMaterial();
+        std::vector<GLMaterial::Material*> getMaterial();
 };

@@ -36,10 +36,10 @@ void App::Loop()
     UIEngine::WSceneViewer viewer = UIEngine::WSceneViewer("Scene hierarchy");
     viewer.SetScene(manager);
 
-    UIEngine::WSettings setting = UIEngine::WSettings("Component");
+    UIEngine::WSettings setting = UIEngine::WSettings("Inspector");
     setting.SetScene(manager);
 
-    Shader shader("/home/joshua/Projects/Angler/res/base.vert", "/home/joshua/Projects/Angler/res/base.frag");
+    Shader shader("/home/joshua/Projects/Angler/AnglerED/shaders/base.vert", "/home/joshua/Projects/Angler/AnglerED/shaders/base.frag");
     shader.use();
 
     glm::mat4 model = glm::mat4(1.0f);
