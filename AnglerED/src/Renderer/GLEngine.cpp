@@ -24,6 +24,48 @@ namespace GLEngine
     void GLEngine::End()
     {
     }
+
+} // namespace GLEngine
+
+namespace GLEngine
+{
+    GLuint generateTexture(unsigned char *data, int width, int height, int nrChannels)
+    {
+        unsigned int textureID;
+        glGenTextures(1, &textureID);
+        if (data)
+        {
+            GLenum format;
+            if (nrChannels == 1)
+            {
+                format = GL_RED;
+            }
+            else if (nrChannels == 3)
+            {
+                format = GL_RGB;
+            }
+            else if (nrChannels == 4)
+            {
+                format = GL_RGBA;
+            }
+
+            glBindTexture(GL_TEXTURE_2D, textureID);
+            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+        else
+        {
+            spdlog::error("GLTexture Texture failed to load!");
+        }
+
+        return textureID;
+    }
+
 } // namespace GLEngine
 
 // GL Vertex Object
@@ -38,7 +80,7 @@ namespace GLEngine
 
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, size * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
@@ -47,10 +89,7 @@ namespace GLEngine
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, Normals));
 
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, Diffuse));
-
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, uv));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, uv));
 
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -76,6 +115,69 @@ namespace GLEngine
     {
         glBindVertexArray(0);
     }
+} // namespace GLEngine
+
+// Index Buffer
+namespace GLEngine
+{
+    int IndexedBuffer::Init(const std::vector<Vertex> &vertices, const std::vector<unsigned> &indices)
+    {
+        size = indices.size();
+        glGenVertexArrays(1, &VAO);
+
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
+
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, Normals));
+
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, uv));
+
+        // glEnableVertexAttribArray(3);
+        // glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, Tangent));
+
+        // glEnableVertexAttribArray(4);
+        // glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void
+        // *)offsetof(Vertex, Bitangent));
+
+        glBindVertexArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        return 0;
+    }
+
+    void IndexedBuffer::Render() const
+    {
+        glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);
+    }
+
+    void IndexedBuffer::Destroy()
+    {
+    }
+
+    void IndexedBuffer::Bind() const
+    {
+        glBindVertexArray(VAO);
+    }
+
+    void IndexedBuffer::Unbind() const
+    {
+        glBindVertexArray(0);
+    }
+
 } // namespace GLEngine
 
 // Framebuffer

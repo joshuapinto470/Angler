@@ -23,7 +23,7 @@ namespace SceneManager
 
       private:
         // The root node of the scene graph.
-        DS::ENode *m_node;
+        DS::ENode *m_node = nullptr;
     };
 
     class SceneManager

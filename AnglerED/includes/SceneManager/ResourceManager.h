@@ -1,8 +1,9 @@
 #pragma once
 
-#include <GLMesh.h>
+#include <GLModel.h>
 #include <GLMaterial.h>
 #include <Shader.h>
+#include <ModelLoader.h>
 
 namespace ResourceManager
 {
@@ -39,18 +40,18 @@ namespace ResourceManager
     class ResourceManager
     {
       public:
-        ResourceManager() = default;
-        unsigned LoadMesh(GLMesh &);
-        unsigned LoadShader(Shader &);
-        unsigned LoadMaterial(GLMaterial::Material &);
+        ResourceManager();
+        unsigned LoadModel(std::string &);
+        unsigned LoadShader(std::string &);
 
         GLMesh &getMesh(unsigned);
         Shader &getShader(unsigned);
-        GLMaterial::Material &getMaterial(unsigned);
+        GLEngine::Material &getMaterial(unsigned);
 
       private:
         std::vector<GLMesh> m_meshes;
-        std::vector<GLMaterial::Material> m_materials;
+        std::vector<GLEngine::Material> m_materials;
+        std::vector<GLEngine::Texture> m_textures;
         std::vector<Shader> m_shaders;
     };
 } // namespace ResourceManager

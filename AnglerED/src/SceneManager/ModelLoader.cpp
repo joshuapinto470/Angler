@@ -1,46 +1,201 @@
 #include <ModelLoader.h>
-#include "spdlog/spdlog.h"
-#include <GLEngine.h>
-#include <GLMaterial.h>
-#include <DataStructures.h>
+
+#ifndef USE_ASSIMP
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
+#endif
 
 using DS::Vertex;
 
 #ifdef USE_ASSIMP
-    #include <assimp/Importer.hpp>
-    #include <assimp/scene.h>
-    #include <assimp/postprocess.h>
-#elif
-    #define TINYOBJLOADER_IMPLEMENTATION
-    #include "tiny_obj_loader.h"
-#endif
 
-ModelLoader ::ModelLoader()
+#include <stb/stb_image.h>
+
+inline glm::vec3 aiVec3_to_glm(aiVector3D &vec)
 {
+    return glm::vec3(vec.x, vec.y, vec.z);
 }
 
-ModelLoader ::~ModelLoader()
+inline glm::vec2 aiVec3_to_glm2(aiVector3D &vec)
 {
+    return glm::vec2(vec.x, vec.y);
 }
 
-#ifdef USE_ASSIMP
-Model ModelLoader::LoadModel(std::string path)
+GLuint TextureFromFile(const char *path, const std::string &directory)
+{
+    std::string filename = std::string(path);
+    filename = directory + '/' + filename;
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    if (!data)
+        spdlog::warn("AssimpLoader Could not load texture!");
+    GLuint id = GLEngine::generateTexture(data, width, height, nrComponents);
+    stbi_image_free(data);
+    return id;
+}
+
+MeshData AssimpLoader::loadMesh(aiMesh *mesh)
+{
+    MeshData data;
+    data.m_vertices.reserve(mesh->mNumVertices);
+    data.m_indices.reserve(mesh->mNumFaces);
+
+    // Load mesh vertex data
+    for (unsigned j = 0; j < mesh->mNumVertices; j++)
+    {
+        Vertex vert;
+
+        vert.Position = aiVec3_to_glm(mesh->mVertices[j]);
+        vert.Normals = mesh->HasNormals() ? aiVec3_to_glm(mesh->mNormals[j]) : glm::vec3(0.0f);
+        vert.uv = mesh->mTextureCoords[0] ? aiVec3_to_glm2(mesh->mTextureCoords[0][j]) : glm::vec2(0.0f);
+
+        data.m_vertices.push_back(vert);
+    }
+
+    // Load mesh index data
+    for (unsigned int j = 0; j < mesh->mNumFaces; j++)
+    {
+        aiFace face = mesh->mFaces[j];
+        // retrieve all indices of the face and store them in the indices vector
+        for (unsigned int k = 0; k < face.mNumIndices; k++)
+        {
+            data.m_indices.push_back(face.mIndices[k]);
+        }
+    }
+
+    return data;
+}
+
+GLEngine::MaterialData AssimpLoader::loadMaterial(aiMaterial *material)
+{
+    aiString name = material->GetName();
+    for (int i = 0; i < m_materials.size(); i++)
+    {
+        if (strcmp(name.C_Str(), m_materials[i].name.c_str()) == 0)
+        {
+            return m_materials[i];
+        }
+    }
+
+    GLEngine::MaterialData mat;
+    mat.name = name.C_Str();
+    material->Get(AI_MATKEY_COLOR_DIFFUSE, mat.diffuse);
+
+    // Load Diffuse Maps
+    aiTextureType type = aiTextureType_DIFFUSE;
+    for (unsigned j = 0; j < material->GetTextureCount(type); j++)
+    {
+        aiString path;
+        material->GetTexture(type, j, &path);
+
+        bool textureLoaded = false;
+        for (unsigned i = 0; i < m_textures.size(); i++)
+        {
+            if (strcmp(m_textures[i].path.c_str(), path.C_Str()) == 0)
+            {
+                textureLoaded = true;
+                mat.m_textures.push_back(m_textures[i]);
+                break;
+            }
+        }
+
+        if (!textureLoaded)
+        {
+            GLEngine::Texture texture;
+            texture.id = TextureFromFile(path.C_Str(), m_directory);
+            texture.path = path.C_Str();
+            texture.type = type;
+            m_textures.push_back(texture);
+            mat.m_textures.push_back(texture);
+        }
+    }
+
+    return mat;
+}
+
+Model AssimpLoader::LoadModel(std::string path)
 {
     Assimp::Importer importer;
 
     const aiScene *scene = importer.ReadFile(path, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
                                                        aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
 
-    if (nullptr == scene)
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         spdlog::warn("File Reader {}", importer.GetErrorString());
         return Model();
     }
 
-    return Model();
+    m_directory = path.substr(0, path.find_last_of('/'));
+
+    // Process all the meshes in the scene first
+    m_meshes.clear();
+    m_meshes.reserve(scene->mNumMeshes);
+    for (unsigned i = 0; i < scene->mNumMeshes; i++)
+    {
+        GLMesh _mesh;
+        aiMesh *a_mesh = scene->mMeshes[i];
+        MeshData data = loadMesh(a_mesh);
+        _mesh.m_mesh = data;
+        _mesh.m_name = a_mesh->mName.C_Str();
+        _mesh.m_material = a_mesh->mMaterialIndex;
+        m_meshes.push_back(_mesh);
+    }
+
+    // Process all the materials in the scene.
+    for (unsigned i = 0; i < scene->mNumMaterials; i++)
+    {
+        aiMaterial *material = scene->mMaterials[i];
+        m_materials.emplace_back(loadMaterial(material));
+    }
+
+    // std::vector<aiNode *> stack;
+    // stack.push_back(scene->mRootNode);
+
+    // while (!stack.empty())
+    // {
+    //     aiNode *node = stack.back();
+    //     stack.pop_back();
+
+    //     // Process node
+    //     MeshFilter meshfilter;
+    //     for (unsigned i = 0; i < node->mNumMeshes; i++)
+    //     {
+    //         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+
+    //         GLMesh amesh;
+    //         amesh.m_name = mesh->mName.C_Str();
+
+    //         // Load the vertex and index data
+    //         MeshData mesh_data = loadMesh(mesh);
+    //         amesh.m_mesh = mesh_data;
+
+    //         // Load all the materials for this mesh
+    //         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+    //         GLEngine::MaterialData mat = loadMaterial(material);
+
+    //         m_materials.push_back(mat);
+    //         GLEngine::Material _mat;
+    //         _mat.data = mat;
+    //         amesh.m_material = mesh->mMaterialIndex;
+    //         m_meshes.push_back(amesh);
+    //         meshfilter.m_meshes.push_back(amesh);
+    //     }
+
+    //     // push children
+    //     for (unsigned i = 0; i < node->mNumChildren; i++)
+    //     {
+    //         stack.push_back(node->mChildren[i]);
+    //     }
+    // }
+
+    MeshFilter meshes;
+    meshes.m_meshes = m_meshes;
+    return Model(meshes);
 }
+
 #else
-Model ModelLoader::LoadModel(std ::string path)
+Model ObjLoader::LoadModel(std ::string path)
 {
     tinyobj::ObjReaderConfig reader_config;
     // .mtl search path same as model directory
@@ -93,7 +248,7 @@ Model ModelLoader::LoadModel(std ::string path)
             if (mat_id >= 0)
             {
                 tinyobj::material_t mat = materials[mat_id];
-                vertex.Diffuse = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
+                // vertex.Diffuse = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
                 // vertex.mat_id = mat_id;
             }
 

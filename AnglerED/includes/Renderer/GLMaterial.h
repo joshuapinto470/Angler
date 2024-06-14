@@ -2,19 +2,25 @@
 #include <pch.h>
 #include <Shader.h>
 
-namespace GLMaterial
+namespace GLEngine
 {
+    struct Texture
+    {
+        GLuint id;
+        std::string type;
+        std::string path;
+    };
+
+    struct MaterialData
+    {
+        std::string name;
+        glm::vec3 diffuse;
+        std::vector<Texture> m_textures;
+    };
+
     struct Material
     {
-        glm::vec3 diffuse;
-        glm::vec3 specular;
-        float roughness;
-
-        Shader *shader;
-
-        std::string name;
-
-        Material();
-        Material(glm::vec3, glm::vec3, float, Shader *);
+        MaterialData data;
+        unsigned shaderIndex;
     };
 } // namespace GLMaterial

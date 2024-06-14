@@ -23,7 +23,7 @@ void App::Init()
 
 void App::Loop()
 {
-    ModelLoader loader;
+    AssimpLoader loader;
     Model mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/simple.obj");
 
     SceneManager::SceneManager* manager = new SceneManager::SceneManager();

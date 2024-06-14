@@ -211,7 +211,7 @@ namespace UIEngine
                     ImGui::TableNextColumn();
                     ImGui::Text("Index %d", row);
                     ImGui::TableNextColumn();
-                    ImGui::Text("%s", _mat->name.c_str());
+                    ImGui::Text("%s", _mat->data.name.c_str());
                 }
                 ImGui::EndTable();
             }

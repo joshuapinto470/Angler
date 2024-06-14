@@ -20,6 +20,7 @@ endif ()
 
 
 set(USE_AnglerRT False)
+set(USE_ASSIMP True)
 
 # Add local repository for FindXXX.cmake modules.
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/AnglerED/vendor/" ${CMAKE_MODULE_PATH})
@@ -46,11 +47,15 @@ include_directories(
 )
 
 find_library(SPDLOG_LIB spdlog ../libs/spdlog)
-find_package(Assimp REQUIRED)
-if(ASSIMP_FOUND)
-message(STATUS "Assimp Found")
-set(USE_ASSIMP True)
-endif()
+
+set(ASSIMP_FOUND False)
+if(USE_ASSIMP)
+        find_package(Assimp REQUIRED)
+        if(ASSIMP_FOUND)
+                message(STATUS "Assimp Found")
+                set(USE_ASSIMP True)
+        endif(ASSIMP_FOUND)
+endif(USE_ASSIMP)
 
 SET(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 SET(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -70,7 +75,6 @@ src/SceneManager/ModelLoader.cpp
 src/SceneManager/SceneManager.cpp
 src/SceneManager/ResourceManager.cpp
 src/Entity/GLModel.cpp
-src/Entity/GLMesh.cpp
 src/Entity/GLCamera.cpp
 src/Entity/GLLight.cpp
 src/Entity/GLEntity.cpp

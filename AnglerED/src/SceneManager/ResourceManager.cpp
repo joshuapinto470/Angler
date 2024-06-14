@@ -1,23 +1,39 @@
 #include <ResourceManager.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
 
 namespace ResourceManager
 {
-    unsigned ResourceManager::LoadMesh(GLMesh &mesh)
+    ResourceManager::ResourceManager()
     {
-        m_meshes.push_back(mesh);
-        return m_meshes.size();
+        Shader defaultShader("/home/joshua/Projects/Angler/AnglerED/shaders/base.vert",
+                             "/home/joshua/Projects/Angler/AnglerED/shaders/base.frag");
+        m_shaders.push_back(defaultShader);
     }
 
-    unsigned ResourceManager::LoadShader(Shader &shader)
+    unsigned ResourceManager::LoadModel(std::string &path)
     {
-        m_shaders.push_back(shader);
-        return m_shaders.size();
+        AssimpLoader loader;
+        loader.LoadModel(path);
+        std::vector<GLMesh> meshes = loader.getMesh();
+        std::vector<GLEngine::MaterialData> materials = loader.getMaterials();
+        std::vector<GLEngine::Texture> textures = loader.getTextures();
+
+        for (unsigned i = 0; i < textures.size(); i++)
+        {
+            std::string path = textures[i].path;
+            int width, height, nrComponents;
+            unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
+            textures[i].id = GLEngine::generateTexture(data, width, height, nrComponents);
+            stbi_image_free(data);
+        }
+
+        return 0;
     }
 
-    unsigned ResourceManager::LoadMaterial(GLMaterial::Material &material)
+    unsigned ResourceManager::LoadShader(std::string &path)
     {
-        m_materials.push_back(material);
-        return m_materials.size();
+        return 0;
     }
 
     GLMesh &ResourceManager::getMesh(unsigned i)
@@ -30,7 +46,7 @@ namespace ResourceManager
         return m_shaders[i];
     }
 
-    GLMaterial::Material &ResourceManager::getMaterial(unsigned i)
+    GLEngine::Material &ResourceManager::getMaterial(unsigned i)
     {
         return m_materials[i];
     }

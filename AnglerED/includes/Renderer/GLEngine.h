@@ -25,6 +25,22 @@ namespace GLEngine
         void Unbind() const;
     };
 
+    class IndexedBuffer
+    {
+      private:
+        GLuint VBO, VAO, EBO;
+        unsigned size;
+
+      public:
+        IndexedBuffer() : VBO(0), VAO(0), EBO(0){};
+        int Init(const std::vector<DS::Vertex> &, const std::vector<unsigned> &);
+
+        void Render() const;
+        void Destroy();
+        void Bind() const;
+        void Unbind() const;
+    };
+
     class FrameBuffer
     {
       private:
@@ -40,7 +56,10 @@ namespace GLEngine
         void Unbind() const;
         void Clear() const;
         void RescaleBuffer(float, float);
-        GLuint getTexture() {return m_texture;};
+        GLuint getTexture()
+        {
+            return m_texture;
+        };
     };
 
     class GLEngine
@@ -52,4 +71,6 @@ namespace GLEngine
         void PostFrame();
         void End();
     };
+
+    GLuint generateTexture(unsigned char*, int, int, int);
 } // namespace GLEngine

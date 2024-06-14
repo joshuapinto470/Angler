@@ -8,20 +8,17 @@
 
 namespace GLEngine
 {
-
-    using GLMaterial::Material;
-
     class MeshRenderer
     {
-        std::vector<VertexBuffer> vbos;
-        std::vector<Material*> materials;
+        std::vector<IndexedBuffer> vbos;
+        std::vector<Material *> materials;
 
       public:
         MeshRenderer() = default;
         MeshRenderer(MeshFilter &);
-        MeshRenderer(MeshFilter&, std::vector<Material*>&);
+        MeshRenderer(MeshFilter &, std::vector<Material *> &);
 
-        const std::vector<Material*>& getMaterial();
-        const std::vector<VertexBuffer>& getVbo();
+        const std::vector<Material *> &getMaterial();
+        const std::vector<IndexedBuffer> &getVbo();
     };
 } // namespace GLEngine

@@ -6,8 +6,8 @@ namespace GLEngine
     {
         for (const auto &i : mesh.m_meshes)
         {
-            VertexBuffer v;
-            v.Init(i.m_mesh->m_vertices);
+            IndexedBuffer v;
+            v.Init(i.m_mesh.m_vertices, i.m_mesh.m_indices);
             vbos.push_back(v);
         }
     }
@@ -15,8 +15,8 @@ namespace GLEngine
     {
         for (const auto &i : mesh.m_meshes)
         {
-            VertexBuffer v;
-            v.Init(i.m_mesh->m_vertices);
+            IndexedBuffer v;
+            v.Init(i.m_mesh.m_vertices, i.m_mesh.m_indices);
             vbos.push_back(v);
         }
         this->materials = materials;
@@ -27,7 +27,7 @@ namespace GLEngine
         return materials;
     }
 
-    const std::vector<VertexBuffer> &MeshRenderer::getVbo()
+    const std::vector<IndexedBuffer> &MeshRenderer::getVbo()
     {
         return vbos;
     }

@@ -71,7 +71,7 @@ namespace DS
         // m_children = std::vector<T>();
         entity = e;
 
-        name = "Untitled";
+        name = "Untitled Entity";
     }
 
     template <typename T> inline const std::vector<Node<T> *> &Node<T>::getChildren() const
@@ -135,7 +135,6 @@ namespace DS
     {
         glm::vec3 Position;
         glm::vec3 Normals;
-        glm::vec3 Diffuse;
         glm::vec2 uv;
     };
 

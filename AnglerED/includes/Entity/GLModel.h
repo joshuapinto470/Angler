@@ -1,23 +1,34 @@
 #pragma once
 
-#include <GLMesh.h>
+#include <pch.h>
+#include <DataStructures.h>
 #include <GLMaterial.h>
+
+
+struct MeshData
+{
+    std::vector<DS::Vertex> m_vertices;
+    std::vector<unsigned> m_indices;
+};
+
+struct GLMesh
+{
+    std::string m_name;
+    MeshData m_mesh;
+    unsigned m_material;
+};
 
 struct MeshFilter
 {
     std::vector<GLMesh> m_meshes;
 };
 
-class Model
+
+struct Model
 {
     MeshFilter m_mesh;
-    std::vector<GLMaterial::Material*> m_material;
+    std::vector<Model> m_children;
 
-    public:
-        Model() = default;
-        Model(MeshFilter);
-        Model(MeshFilter, std::vector<GLMaterial::Material*>);
-
-        MeshFilter getMesh();
-        std::vector<GLMaterial::Material*> getMaterial();
+    Model() = default;
+    Model(MeshFilter& m) {m_mesh = m;}
 };

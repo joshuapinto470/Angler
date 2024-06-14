@@ -1,6 +1,5 @@
 #version 330 core
 
-in vec3 Diffuse;
 in vec3 FragPos;
 in vec3 Normal;
 
@@ -11,6 +10,7 @@ uniform vec3 lightColor;
 
 void main()
 {
+    vec3 Diffuse = vec3(0.8f, 0.2f, 0.1f);
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
   	
