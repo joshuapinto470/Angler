@@ -38,11 +38,13 @@ namespace SceneManager
 
         std::string name;
 
+        DS::ENode *deepCopy(const MeshNode *);
+
       public:
         SceneManager();
         ~SceneManager();
         void Render();
-        void Add(Model &, DS::ENode *);
+        void Add(const Model &, DS::ENode *);
         void Add(GLEngine::Light &, DS::ENode *);
         void Add(GLEngine::Camera &, DS::ENode *);
         void setActiveNode(DS::ENode *);

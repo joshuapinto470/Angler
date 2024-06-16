@@ -6,11 +6,31 @@ namespace SceneManager
     using DS::Transform;
     using GLEngine::MeshRenderer;
 
+    DS::ENode *SceneManager::deepCopy(const MeshNode *node)
+    {
+        meshNode mesh = node->getEntity();
+        std::vector<unsigned> meshIndices = mesh.m_meshIndices;
+        MeshFilter filter;
+
+        entt::entity m = m_registry.create();
+        m_registry.emplace<Transform>(m, mesh.m_transformation);
+
+        DS::ENode *_node = new DS::ENode(m);
+        _node->setName(node->getName().c_str());
+
+        for (const auto &i : node->getChildren())
+        {
+            _node->addChild(deepCopy(i));
+        }
+
+        return _node;
+    }
+
     SceneManager::SceneManager()
     {
         m_currActive = nullptr;
         // This is a weird workaround for now
-        const auto& e = m_registry.create();
+        const auto &e = m_registry.create();
         m_registry.destroy(e);
 
         name = "Scene 1";
@@ -34,6 +54,7 @@ namespace SceneManager
 
     void SceneManager::Render()
     {
+        BENCHMARK_SCOPE
 
         DS::ENode *root = m_sceneGraph.getRootNode();
 
@@ -70,8 +91,9 @@ namespace SceneManager
         }
     }
 
-    void SceneManager::Add(Model &model, DS::ENode *node)
+    void SceneManager::Add(const Model &model, DS::ENode *node)
     {
+        BENCHMARK_SCOPE
         if (model.m_mesh.m_meshes.empty())
         {
             // For now don't make a node for models with no data
@@ -79,7 +101,12 @@ namespace SceneManager
             return;
         }
 
+        std::shared_ptr<MeshNode> meshNode = model.m_root;
         MeshFilter filter = model.m_mesh;
+        GLEngine::MaterialDataList materials = model.m_materials;
+        GLEngine::TextureList textures = model.m_textures;
+
+        // DS::ENode *copiedNode = deepCopy(meshNode.get());
 
         for (unsigned i = 0; i < filter.m_meshes.size(); i++)
         {
@@ -97,22 +124,6 @@ namespace SceneManager
             DS::ENode *_n = node ? node : m_sceneGraph.getRootNode();
             _n->addChild(n);
         }
-
-        // MeshFilter mesh = model.m_mesh;
-        // // std::vector<GLEngine::Material*> materials = model.getMaterial();
-
-        // const auto &entity = m_registry.create();
-
-        // m_registry.emplace<Transform>(entity);
-        // m_registry.emplace<MeshFilter>(entity, mesh);
-        // MeshFilter m = m_registry.get<MeshFilter>(entity);
-        // m_registry.emplace<MeshRenderer>(entity, m, materials);
-
-        // DS::ENode *n = new DS::ENode(entity);
-        // n->setName(model.getMesh().m_meshes[0].m_name);
-
-        // DS::ENode *_n = node ? node : m_sceneGraph.getRootNode();
-        // _n->addChild(n);
     }
 
     void SceneManager::Add(GLEngine::Camera &camera, DS::ENode *node)
@@ -147,5 +158,6 @@ namespace SceneManager
 
     SceneGraph::~SceneGraph()
     {
+        delete m_node;
     }
 } // namespace SceneManager

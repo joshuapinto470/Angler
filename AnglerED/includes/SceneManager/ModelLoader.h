@@ -20,7 +20,6 @@ class ModelLoader
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-
 class AssimpLoader : public ModelLoader
 {
   private:

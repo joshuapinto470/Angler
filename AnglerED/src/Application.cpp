@@ -76,4 +76,7 @@ void App::Loop()
         ui.EndUI();
         window.PrepareNextFrame();
     }
+
+    // Put this in the destructor.
+    delete manager;
 }

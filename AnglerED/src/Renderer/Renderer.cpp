@@ -11,5 +11,9 @@ namespace GLRenderer
     {
       
     }
-    
+
+    void Renderer::Init()
+    {
+    }
+
 } // namespace GLRenderer

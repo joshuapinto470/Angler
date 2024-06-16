@@ -23,4 +23,8 @@ namespace GLEngine
         MaterialData data;
         unsigned shaderIndex;
     };
-} // namespace GLMaterial
+
+    typedef std::vector<MaterialData> MaterialDataList;
+    typedef std::vector<Texture> TextureList;
+
+} // namespace GLEngine

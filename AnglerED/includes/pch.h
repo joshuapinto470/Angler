@@ -24,5 +24,7 @@
 #include <memory>
 #include <utility>
 
+#include <EDBenchmark.h>
+
 typedef glm::vec<2, unsigned> vec2u;
 typedef glm::vec2 vec2f;

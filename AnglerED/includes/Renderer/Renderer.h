@@ -16,14 +16,15 @@ namespace GLRenderer
 {
     enum RenderCommand
     {
-      DRAW_ELEMENTS,
-      CLEAR,
+        DRAW_ELEMENTS,
+        DRAW_INDICES,
+        CLEAR,
     };
 
     class RenderQueue
     {
       public:
-        void Submit();
+        void Submit(RenderCommand &);
 
       private:
     };
@@ -33,6 +34,7 @@ namespace GLRenderer
       public:
         void Draw();
         void PrepareShader();
+        void Init();
 
       private:
         RenderQueue queue;

@@ -21,8 +21,27 @@ inline glm::vec2 aiVec3_to_glm2(aiVector3D &vec)
     return glm::vec2(vec.x, vec.y);
 }
 
+inline glm::mat4 aiMat4_to_glmMat4(const aiMatrix4x4 &aiMat)
+{
+    return {aiMat.a1, aiMat.b1, aiMat.c1, aiMat.d1, aiMat.a2, aiMat.b2, aiMat.c2, aiMat.d2,
+            aiMat.a3, aiMat.b3, aiMat.c3, aiMat.d3, aiMat.a4, aiMat.b4, aiMat.c4, aiMat.d4};
+}
+
+inline meshNode aiNode_to_meshNode(const aiNode *node)
+{
+    meshNode _n;
+    _n.m_transformation = aiMat4_to_glmMat4(node->mTransformation);
+    for (unsigned i = 0; i < node->mNumMeshes; i++)
+    {
+        _n.m_meshIndices.push_back(node->mMeshes[i]);
+    }
+
+    return _n;
+}
+
 GLuint TextureFromFile(const char *path, const std::string &directory)
 {
+    BENCHMARK_SCOPE
     std::string filename = std::string(path);
     filename = directory + '/' + filename;
     int width, height, nrComponents;
@@ -36,9 +55,10 @@ GLuint TextureFromFile(const char *path, const std::string &directory)
 
 MeshData AssimpLoader::loadMesh(aiMesh *mesh)
 {
+    BENCHMARK_SCOPE
     MeshData data;
     data.m_vertices.reserve(mesh->mNumVertices);
-    data.m_indices.reserve(mesh->mNumFaces);
+    data.m_indices.reserve(mesh->mNumFaces * 3);
 
     // Load mesh vertex data
     for (unsigned j = 0; j < mesh->mNumVertices; j++)
@@ -68,6 +88,7 @@ MeshData AssimpLoader::loadMesh(aiMesh *mesh)
 
 GLEngine::MaterialData AssimpLoader::loadMaterial(aiMaterial *material)
 {
+    BENCHMARK_SCOPE
     aiString name = material->GetName();
     for (int i = 0; i < m_materials.size(); i++)
     {
@@ -113,8 +134,26 @@ GLEngine::MaterialData AssimpLoader::loadMaterial(aiMaterial *material)
     return mat;
 }
 
+MeshNode *deepCopy(aiNode *node)
+{
+    meshNode m = aiNode_to_meshNode(node);
+    MeshNode *_node = new MeshNode(m);
+
+    _node->setName(node->mName.C_Str());
+
+    for (int i = 0; i < node->mNumChildren; i++)
+    {
+        aiNode *n = node->mChildren[i];
+        _node->addChild(deepCopy(n));
+    }
+
+    return _node;
+}
+
 Model AssimpLoader::LoadModel(std::string path)
 {
+    BENCHMARK_SCOPE
+
     Assimp::Importer importer;
 
     const aiScene *scene = importer.ReadFile(path, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
@@ -149,49 +188,19 @@ Model AssimpLoader::LoadModel(std::string path)
         m_materials.emplace_back(loadMaterial(material));
     }
 
-    // std::vector<aiNode *> stack;
-    // stack.push_back(scene->mRootNode);
-
-    // while (!stack.empty())
-    // {
-    //     aiNode *node = stack.back();
-    //     stack.pop_back();
-
-    //     // Process node
-    //     MeshFilter meshfilter;
-    //     for (unsigned i = 0; i < node->mNumMeshes; i++)
-    //     {
-    //         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-
-    //         GLMesh amesh;
-    //         amesh.m_name = mesh->mName.C_Str();
-
-    //         // Load the vertex and index data
-    //         MeshData mesh_data = loadMesh(mesh);
-    //         amesh.m_mesh = mesh_data;
-
-    //         // Load all the materials for this mesh
-    //         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-    //         GLEngine::MaterialData mat = loadMaterial(material);
-
-    //         m_materials.push_back(mat);
-    //         GLEngine::Material _mat;
-    //         _mat.data = mat;
-    //         amesh.m_material = mesh->mMaterialIndex;
-    //         m_meshes.push_back(amesh);
-    //         meshfilter.m_meshes.push_back(amesh);
-    //     }
-
-    //     // push children
-    //     for (unsigned i = 0; i < node->mNumChildren; i++)
-    //     {
-    //         stack.push_back(node->mChildren[i]);
-    //     }
-    // }
+    // Create the scene hierarchy
+    std::shared_ptr<MeshNode> root(deepCopy(scene->mRootNode));
 
     MeshFilter meshes;
     meshes.m_meshes = m_meshes;
-    return Model(meshes);
+
+    Model model;
+    model.m_mesh = meshes;
+    model.m_root = root;
+    model.m_materials = m_materials;
+    model.m_textures = m_textures;
+
+    return model;
 }
 
 #else

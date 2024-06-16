@@ -5,10 +5,12 @@ int main(int argc, char *argv[]) {
 
     // AnglerED angler(800, 400);
     // angler.Loop();
+    BENCH_SESSION_START
     App app;
     app.Init();
     app.Loop();
-
+    BENCH_SESSION_END
+    spdlog::info("Exit");
     return 0;
 }
 

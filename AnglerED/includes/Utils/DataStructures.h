@@ -33,6 +33,7 @@ namespace DS
       public:
         Node();
         Node(T);
+        ~Node();
 
         const std::vector<Node<T> *> &getChildren() const;
         std::vector<Node<T> *> &getChildren();
@@ -61,17 +62,29 @@ namespace DS
     template <typename T> Node<T>::Node()
     {
         m_parent = nullptr;
-        // m_children = std::vector<T>();
         name = "Untitled";
     }
 
     template <typename T> inline Node<T>::Node(T e)
     {
         m_parent = nullptr;
-        // m_children = std::vector<T>();
         entity = e;
-
         name = "Untitled Entity";
+    }
+
+    template <typename T> inline Node<T>::~Node()
+    {
+        for (int i = 0; i < m_children.size(); i++)
+        {
+            if (m_children[i])
+            {
+                delete m_children[i];
+            }
+            m_children[i] = nullptr;
+        }
+
+        m_children.erase(std::remove(m_children.begin(), m_children.end(), nullptr), m_children.end());
+        m_parent = nullptr;
     }
 
     template <typename T> inline const std::vector<Node<T> *> &Node<T>::getChildren() const
@@ -142,6 +155,7 @@ namespace DS
     {
         glm::mat4 transform;
         Transform() : transform(1.0f){};
+        Transform(glm::mat4 &m) : transform(m){};
     };
 
 } // namespace DS
