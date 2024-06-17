@@ -31,6 +31,8 @@ namespace UIEngine
 
         float w = ImGui::GetContentRegionAvail().x;
         float h = ImGui::GetContentRegionAvail().y;
+        m_width = w;
+        m_height = h;
 
         ImVec2 pos = ImGui::GetCursorScreenPos();
         framebuffer.RescaleBuffer(w, h);
@@ -194,29 +196,29 @@ namespace UIEngine
         if (!m)
             return;
 
-        std::vector<GLEngine::Material *> mat = m->getMaterial();
+        // std::vector<GLEngine::Material *> mat = m->getMaterial();
 
-        ImGuiTreeNodeFlags base_flags =
-            ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
-        if (ImGui::TreeNodeEx("_Materials", base_flags, "Materials"))
-        {
-            if (ImGui::BeginTable("", 3))
-            {
-                for (int row = 0; row < mat.size(); row++)
-                {
-                    GLEngine::Material *_mat = mat[row];
-                    if (!_mat)
-                        continue;
-                    ImGui::TableNextRow();
-                    ImGui::TableNextColumn();
-                    ImGui::Text("Index %d", row);
-                    ImGui::TableNextColumn();
-                    ImGui::Text("%s", _mat->data.name.c_str());
-                }
-                ImGui::EndTable();
-            }
-            ImGui::TreePop();
-        }
+        // ImGuiTreeNodeFlags base_flags =
+        //     ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+        // if (ImGui::TreeNodeEx("_Materials", base_flags, "Materials"))
+        // {
+        //     if (ImGui::BeginTable("", 3))
+        //     {
+        //         for (int row = 0; row < mat.size(); row++)
+        //         {
+        //             GLEngine::Material *_mat = mat[row];
+        //             if (!_mat)
+        //                 continue;
+        //             ImGui::TableNextRow();
+        //             ImGui::TableNextColumn();
+        //             ImGui::Text("Index %d", row);
+        //             ImGui::TableNextColumn();
+        //             ImGui::Text("%s", _mat->data.name.c_str());
+        //         }
+        //         ImGui::EndTable();
+        //     }
+        //     ImGui::TreePop();
+        // }
     }
 
     static void DrawVec3Controls(const std::string &label, glm::vec3& value)

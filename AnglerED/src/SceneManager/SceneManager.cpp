@@ -12,6 +12,7 @@ namespace SceneManager
         std::vector<unsigned> meshIndices = mesh.m_meshIndices;
         MeshFilter filter;
         MeshFilter mesh_pool = m_meshBucket.back();
+        GLEngine::MaterialList material_pool = m_materialBucket.back();
 
         for (const auto &i : meshIndices)
         {
@@ -20,7 +21,7 @@ namespace SceneManager
 
         entt::entity m = m_registry.create();
         m_registry.emplace<Transform>(m, mesh.m_transformation);
-        m_registry.emplace<MeshRenderer>(m, filter);
+        m_registry.emplace<MeshRenderer>(m, filter, material_pool);
 
         DS::ENode *_node = new DS::ENode(m);
         _node->setName(node->getName().c_str());
@@ -39,8 +40,10 @@ namespace SceneManager
         // This is a weird workaround for now
         const auto &e = m_registry.create();
         m_registry.destroy(e);
-        defaultShader = Shader("/home/joshua/Projects/Angler/AnglerED/shaders/base.vert",
-                               "/home/joshua/Projects/Angler/AnglerED/shaders/base.frag");
+        Shader defaultShader = Shader("/home/joshua/Projects/Angler/AnglerED/shaders/base.vert",
+                                      "/home/joshua/Projects/Angler/AnglerED/shaders/base.frag");
+
+        m_shaders["default_shader"] = defaultShader;
 
         name = "Scene 1";
         DS::ENode *root = m_sceneGraph.getRootNode();
@@ -97,15 +100,22 @@ namespace SceneManager
             auto renderer = m_registry.try_get<MeshRenderer>(e);
             auto transform = m_registry.try_get<Transform>(e);
             if (transform)
-                defaultShader.setMat4("model", transform->transform * p_transform.transform);
+                m_shaders["default_shader"].setMat4("model", transform->transform * p_transform.transform);
 
             if (renderer)
             {
-                for (const auto &i : renderer->getVbo())
+                auto &materialList = renderer->getMaterials();
+                auto &indexBuffers = renderer->getVbo();
+
+                for (unsigned i = 0; i < indexBuffers.size(); i++)
                 {
-                    i.Bind();
-                    i.Render();
-                    i.Unbind();
+                    GLEngine::Material mat = materialList[i];
+                    glm::vec3 diffuse =  mat.data.diffuse;
+                    // diffuse = glm::vec3(0.8f, 0.8f, 0.1f);
+                    m_shaders["default_shader"].setVec3("diffuse_color", diffuse);
+                    indexBuffers[i].Bind();
+                    indexBuffers[i].Render();
+                    indexBuffers[i].Unbind();
                 }
             }
 
@@ -132,29 +142,22 @@ namespace SceneManager
         GLEngine::TextureList textures = model.m_textures;
         m_meshBucket.push_back(filter);
 
+        GLEngine::MaterialList _materials;
+        for (const auto &i : materials)
+        {
+            GLEngine::Material _mat;
+            _mat.data = i;
+            _mat.shaderName = "default_shader";
+            _materials.push_back(_mat);
+        }
+
+        m_materialBucket.push_back(_materials);
+        m_textureBucket.push_back(textures);
+
         DS::ENode *copiedNode = deepCopy(meshNode.get());
 
         DS::ENode *_n = node ? node : m_sceneGraph.getRootNode();
         _n->addChild(copiedNode);
-
-        /*
-        for (unsigned i = 0; i < filter.m_meshes.size(); i++)
-        {
-            GLMesh mesh = filter.m_meshes[i];
-            std::string name = mesh.m_name;
-
-            const auto &entity = m_registry.create();
-
-            m_registry.emplace<Transform>(entity);
-            // m_registry.emplace<MeshData>(entity, mesh.m_mesh);
-            m_registry.emplace<MeshRenderer>(entity, filter);
-
-            DS::ENode *n = new DS::ENode(entity);
-            n->setName(name.c_str());
-            DS::ENode *_n = node ? node : m_sceneGraph.getRootNode();
-            _n->addChild(n);
-        }
-        */
     }
 
     void SceneManager::Add(GLEngine::Camera &camera, DS::ENode *node)

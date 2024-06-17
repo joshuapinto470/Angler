@@ -21,10 +21,11 @@ namespace GLEngine
     struct Material
     {
         MaterialData data;
-        unsigned shaderIndex;
+        std::string shaderName;
     };
 
     typedef std::vector<MaterialData> MaterialDataList;
+    typedef std::vector<Material> MaterialList;
     typedef std::vector<Texture> TextureList;
 
 } // namespace GLEngine

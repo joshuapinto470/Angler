@@ -11,14 +11,13 @@ namespace GLEngine
     class MeshRenderer
     {
         std::vector<IndexedBuffer> vbos;
-        std::vector<Material *> materials;
+        std::vector<Material> materials;
 
       public:
         MeshRenderer() = default;
-        MeshRenderer(MeshFilter &);
-        MeshRenderer(MeshFilter &, std::vector<Material *> &);
+        MeshRenderer(MeshFilter &, MaterialList &);
 
-        const std::vector<Material *> &getMaterial();
         const std::vector<IndexedBuffer> &getVbo();
+        const std::vector<Material> &getMaterials();
     };
 } // namespace GLEngine

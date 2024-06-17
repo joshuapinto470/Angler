@@ -90,6 +90,8 @@ GLEngine::MaterialData AssimpLoader::loadMaterial(aiMaterial *material)
 {
     BENCHMARK_SCOPE
     aiString name = material->GetName();
+
+    // If the material is already loaded return it.
     for (int i = 0; i < m_materials.size(); i++)
     {
         if (strcmp(name.C_Str(), m_materials[i].name.c_str()) == 0)
@@ -100,10 +102,16 @@ GLEngine::MaterialData AssimpLoader::loadMaterial(aiMaterial *material)
 
     GLEngine::MaterialData mat;
     mat.name = name.C_Str();
-    material->Get(AI_MATKEY_COLOR_DIFFUSE, mat.diffuse);
+    mat.diffuse = glm::vec3(0.1f);
+    aiColor3D diffuse_color;
+    material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse_color);
+    mat.diffuse.r = diffuse_color.r;
+    mat.diffuse.g = diffuse_color.g;
+    mat.diffuse.b = diffuse_color.b;
 
     // Load Diffuse Maps
     aiTextureType type = aiTextureType_DIFFUSE;
+
     for (unsigned j = 0; j < material->GetTextureCount(type); j++)
     {
         aiString path;
@@ -188,11 +196,28 @@ Model AssimpLoader::LoadModel(std::string path)
         m_materials.emplace_back(loadMaterial(material));
     }
 
+    if (scene->HasCameras())
+    {
+        for (unsigned i = 0; i < scene->mNumCameras; i++)
+        {
+            aiCamera *cam = scene->mCameras[i];
+            spdlog::info("ModelLoader Camera : {}", cam->mName.C_Str());
+            glm::vec3 pos = aiVec3_to_glm(cam->mPosition);
+            glm::vec3 lookAt = aiVec3_to_glm(cam->mLookAt);
+            spdlog::info("ModelLoader Position : {}, {}, {}", pos.x, pos.y, pos.z);
+            spdlog::info("ModelLoader LookAt : {}, {}, {}", lookAt.x, lookAt.y, lookAt.z);
+        }
+    }
+
     // Create the scene hierarchy
     std::shared_ptr<MeshNode> root(deepCopy(scene->mRootNode));
 
     MeshFilter meshes;
     meshes.m_meshes = m_meshes;
+
+    spdlog::info("ModelLoader - Total Meshes: {}", meshes.m_meshes.size());
+    spdlog::info("ModelLoader - Total Materials: {}", m_materials.size());
+    spdlog::info("ModelLoader - Total Textures: {}", m_textures.size());
 
     Model model;
     model.m_mesh = meshes;

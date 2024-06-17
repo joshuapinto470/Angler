@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pch.h>
+#include <map>
 #include <GLEngine.h>
 #include <GLModel.h>
 #include <Renderer.h>
@@ -36,15 +37,15 @@ namespace SceneManager
         // Scene state
         DS::ENode *m_currActive;
         std::vector<MeshFilter> m_meshBucket;
+        std::vector<GLEngine::TextureList> m_textureBucket;
+        std::vector<GLEngine::MaterialList> m_materialBucket;
+        std::map<std::string, Shader> m_shaders;
 
         std::string name;
 
         DS::ENode *deepCopy(const MeshNode *);
 
-      public:
-      // Temp
-        Shader defaultShader;
-        
+      public:        
         SceneManager();
         ~SceneManager();
         void Render();
@@ -58,6 +59,11 @@ namespace SceneManager
         {
             return m_sceneGraph.getRootNode();
         };
+
+        Shader getDefaultShader()
+        {
+          return m_shaders["default_shader"];
+        }
 
         template <class T> T *getComponent(DS::ENode *e)
         {

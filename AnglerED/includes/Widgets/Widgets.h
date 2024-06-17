@@ -17,10 +17,15 @@ namespace UIEngine
       private:
         SceneManager::SceneManager *m_scene;
         GLEngine::FrameBuffer framebuffer;
+        unsigned m_width, m_height;
 
       public:
         ViewportWidget(std::string);
         void SetScene(SceneManager::SceneManager *);
+        glm::vec2 getViewportDim()
+        {
+            return glm::vec2(m_width, m_height);
+        };
         void Render() override;
     };
 
@@ -57,6 +62,6 @@ namespace UIEngine
     };
 
     void WTransform(DS::Transform *);
-    void WMeshRenderer(GLEngine::MeshRenderer* );
-    static void DrawVec3Controls(const std::string &, glm::vec3&);
+    void WMeshRenderer(GLEngine::MeshRenderer *);
+    static void DrawVec3Controls(const std::string &, glm::vec3 &);
 } // namespace UIEngine

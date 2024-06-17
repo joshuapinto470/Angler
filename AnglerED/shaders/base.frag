@@ -7,10 +7,11 @@ out vec4 FragColor;
 
 uniform vec3 lightPos; 
 uniform vec3 lightColor;
+uniform vec3 diffuse_color;
 
 void main()
 {
-    vec3 Diffuse = vec3(0.8f, 0.2f, 0.1f);
+    vec3 Diffuse = diffuse_color;
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
   	
