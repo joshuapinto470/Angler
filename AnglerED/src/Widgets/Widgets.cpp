@@ -219,7 +219,7 @@ namespace UIEngine
         }
     }
 
-    static void DrawVec3Controls(const std::string &label, glm::vec3 value)
+    static void DrawVec3Controls(const std::string &label, glm::vec3& value)
     {
         ImGui::PushID(label.c_str());
         ImGui::Columns(2);

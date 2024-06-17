@@ -58,5 +58,5 @@ namespace UIEngine
 
     void WTransform(DS::Transform *);
     void WMeshRenderer(GLEngine::MeshRenderer* );
-    static void DrawVec3Controls(const std::string &, glm::vec3);
+    static void DrawVec3Controls(const std::string &, glm::vec3&);
 } // namespace UIEngine

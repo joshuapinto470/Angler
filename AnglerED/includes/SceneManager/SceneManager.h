@@ -35,12 +35,16 @@ namespace SceneManager
 
         // Scene state
         DS::ENode *m_currActive;
+        std::vector<MeshFilter> m_meshBucket;
 
         std::string name;
 
         DS::ENode *deepCopy(const MeshNode *);
 
       public:
+      // Temp
+        Shader defaultShader;
+        
         SceneManager();
         ~SceneManager();
         void Render();

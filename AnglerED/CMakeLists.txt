@@ -1,6 +1,8 @@
 project(AnglerED)
 set (CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(${PROJECT_NAME}_MAJOR_VERSION 0)
 set(${PROJECT_NAME}_MINOR_VERSION 1)
 set(${PROJECT_NAME}_PATCH_LEVEL 0)
@@ -21,6 +23,9 @@ endif ()
 
 set(USE_AnglerRT False)
 set(USE_ASSIMP True)
+
+# Set gprof profiling
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
 
 # Add local repository for FindXXX.cmake modules.
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/AnglerED/vendor/" ${CMAKE_MODULE_PATH})

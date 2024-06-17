@@ -24,7 +24,7 @@ void App::Init()
 void App::Loop()
 {
     AssimpLoader loader;
-    Model mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/simple.obj");
+    Model mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/models/Basic gltf/basic.glb");
 
     SceneManager::SceneManager* manager = new SceneManager::SceneManager();
     manager->Add(mModel, nullptr);
@@ -39,8 +39,8 @@ void App::Loop()
     UIEngine::WSettings setting = UIEngine::WSettings("Inspector");
     setting.SetScene(manager);
 
-    Shader shader("/home/joshua/Projects/Angler/AnglerED/shaders/base.vert", "/home/joshua/Projects/Angler/AnglerED/shaders/base.frag");
-    shader.use();
+    // Shader shader("/home/joshua/Projects/Angler/AnglerED/shaders/base.vert", "/home/joshua/Projects/Angler/AnglerED/shaders/base.frag");
+    manager->defaultShader.use();
 
     glm::mat4 model = glm::mat4(1.0f);
 
@@ -50,19 +50,19 @@ void App::Loop()
     glm::mat4 view;
     view = glm::lookAt(glm::vec3(0.0f, 2.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    shader.setMat4("view", view);
-    shader.setMat4("projection", projection);
+    manager->defaultShader.setMat4("view", view);
+    manager->defaultShader.setMat4("projection", projection);
 
     /* Lighting info */
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-    shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-    shader.setVec3("lightPos", lightPos);
+    manager->defaultShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+    manager->defaultShader.setVec3("lightPos", lightPos);
 
     while (!window.CloseWindow())
     {
         model = glm::rotate(model, glm::radians(0.15f), glm::vec3(0.f, 1.f, 0.f));
-        shader.setMat4("model", model);
+        manager->defaultShader.setMat4("model", model);
         engine.PreFrame();
         // Render stuff here.
 
