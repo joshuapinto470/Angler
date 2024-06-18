@@ -35,7 +35,7 @@ namespace GLEngine
         glGenTextures(1, &textureID);
         if (data)
         {
-            GLenum format;
+            GLenum format = GL_RGB;
             if (nrChannels == 1)
             {
                 format = GL_RED;
@@ -111,7 +111,7 @@ namespace GLEngine
         glBindVertexArray(VAO);
     }
 
-    void VertexBuffer::Unbind() const
+    void VertexBuffer::Unbind()
     {
         glBindVertexArray(0);
     }
@@ -173,7 +173,7 @@ namespace GLEngine
         glBindVertexArray(VAO);
     }
 
-    void IndexedBuffer::Unbind() const
+    void IndexedBuffer::Unbind()
     {
         glBindVertexArray(0);
     }
@@ -215,7 +215,7 @@ namespace GLEngine
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     }
 
-    void FrameBuffer::Unbind() const
+    void FrameBuffer::Unbind()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -228,7 +228,7 @@ namespace GLEngine
         Unbind();
     }
 
-    void FrameBuffer::RescaleBuffer(float width, float height)
+    void FrameBuffer::RescaleBuffer(float width, float height) const
     {
         glBindTexture(GL_TEXTURE_2D, m_texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);

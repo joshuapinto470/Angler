@@ -13,12 +13,12 @@ using DS::Vertex;
 
 inline glm::vec3 aiVec3_to_glm(aiVector3D &vec)
 {
-    return glm::vec3(vec.x, vec.y, vec.z);
+    return {vec.x, vec.y, vec.z};
 }
 
 inline glm::vec2 aiVec3_to_glm2(aiVector3D &vec)
 {
-    return glm::vec2(vec.x, vec.y);
+    return {vec.x, vec.y};
 }
 
 inline glm::mat4 aiMat4_to_glmMat4(const aiMatrix4x4 &aiMat)
@@ -53,7 +53,7 @@ GLuint TextureFromFile(const char *path, const std::string &directory)
     return id;
 }
 
-MeshData AssimpLoader::loadMesh(aiMesh *mesh)
+MeshData AssimpLoader::loadMesh(const aiMesh *mesh)
 {
     BENCHMARK_SCOPE
     MeshData data;
@@ -63,7 +63,7 @@ MeshData AssimpLoader::loadMesh(aiMesh *mesh)
     // Load mesh vertex data
     for (unsigned j = 0; j < mesh->mNumVertices; j++)
     {
-        Vertex vert;
+        Vertex vert{};
 
         vert.Position = aiVec3_to_glm(mesh->mVertices[j]);
         vert.Normals = mesh->HasNormals() ? aiVec3_to_glm(mesh->mNormals[j]) : glm::vec3(0.0f);
@@ -92,11 +92,11 @@ GLEngine::MaterialData AssimpLoader::loadMaterial(aiMaterial *material)
     aiString name = material->GetName();
 
     // If the material is already loaded return it.
-    for (int i = 0; i < m_materials.size(); i++)
+    for (auto & m_material : m_materials)
     {
-        if (strcmp(name.C_Str(), m_materials[i].name.c_str()) == 0)
+        if (strcmp(name.C_Str(), m_material.name.c_str()) == 0)
         {
-            return m_materials[i];
+            return m_material;
         }
     }
 
@@ -118,12 +118,12 @@ GLEngine::MaterialData AssimpLoader::loadMaterial(aiMaterial *material)
         material->GetTexture(type, j, &path);
 
         bool textureLoaded = false;
-        for (unsigned i = 0; i < m_textures.size(); i++)
+        for (auto & m_texture : m_textures)
         {
-            if (strcmp(m_textures[i].path.c_str(), path.C_Str()) == 0)
+            if (strcmp(m_texture.path.c_str(), path.C_Str()) == 0)
             {
                 textureLoaded = true;
-                mat.m_textures.push_back(m_textures[i]);
+                mat.m_textures.push_back(m_texture);
                 break;
             }
         }
@@ -133,7 +133,7 @@ GLEngine::MaterialData AssimpLoader::loadMaterial(aiMaterial *material)
             GLEngine::Texture texture;
             texture.id = TextureFromFile(path.C_Str(), m_directory);
             texture.path = path.C_Str();
-            texture.type = type;
+            texture.type = "mat_diffuse";
             m_textures.push_back(texture);
             mat.m_textures.push_back(texture);
         }
@@ -145,7 +145,7 @@ GLEngine::MaterialData AssimpLoader::loadMaterial(aiMaterial *material)
 MeshNode *deepCopy(aiNode *node)
 {
     meshNode m = aiNode_to_meshNode(node);
-    MeshNode *_node = new MeshNode(m);
+    auto *_node = new MeshNode(m);
 
     _node->setName(node->mName.C_Str());
 
@@ -170,7 +170,7 @@ Model AssimpLoader::LoadModel(std::string path)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         spdlog::warn("File Reader {}", importer.GetErrorString());
-        return Model();
+        return {};
     }
 
     m_directory = path.substr(0, path.find_last_of('/'));
@@ -215,15 +215,15 @@ Model AssimpLoader::LoadModel(std::string path)
     MeshFilter meshes;
     meshes.m_meshes = m_meshes;
 
-    spdlog::info("ModelLoader - Total Meshes: {}", meshes.m_meshes.size());
-    spdlog::info("ModelLoader - Total Materials: {}", m_materials.size());
-    spdlog::info("ModelLoader - Total Textures: {}", m_textures.size());
-
     Model model;
     model.m_mesh = meshes;
     model.m_root = root;
     model.m_materials = m_materials;
     model.m_textures = m_textures;
+
+    spdlog::info("ModelLoader - Total Meshes: {}", meshes.m_meshes.size());
+    spdlog::info("ModelLoader - Total Materials: {}", m_materials.size());
+    spdlog::info("ModelLoader - Total Textures: {}", m_textures.size());
 
     return model;
 }

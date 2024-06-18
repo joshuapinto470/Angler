@@ -28,7 +28,7 @@ class AssimpLoader : public ModelLoader
     std::vector<GLEngine::Texture> m_textures;
     std::string m_directory;
 
-    MeshData loadMesh(aiMesh *);
+    MeshData loadMesh(const aiMesh *);
     GLEngine::MaterialData loadMaterial(aiMaterial *);
 
   public:

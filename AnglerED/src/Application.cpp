@@ -18,7 +18,7 @@ void App::Init()
 {
     window.Init(1280, 720, "AnglerED");
     ui.Init(window);
-    engine.Init();
+    GLEngine::GLEngine::Init();
 }
 
 void App::Loop()
@@ -27,11 +27,11 @@ void App::Loop()
     Model mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/models/Basic gltf/basic.glb");
     // Model mModel2 = loader.LoadModel("/home/joshua/3DModels/external/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf");
 
-    SceneManager::SceneManager *manager = new SceneManager::SceneManager();
+    auto *manager = new SceneManager::SceneManager();
     manager->Add(mModel, nullptr);
     // manager->Add(mModel2, nullptr);
 
-    UIEngine::ViewportWidget viewport = UIEngine::ViewportWidget("Viewport");
+    UIEngine::ViewportWidget viewport = UIEngine::ViewportWidget( "Viewport");
     viewport.SetScene(manager);
 
     UIEngine::WInfo demo = UIEngine::WInfo("Demo");
@@ -45,7 +45,7 @@ void App::Loop()
 
     defaultShader.use();
 
-    glm::mat4 model = glm::mat4(1.0f);
+    auto model = glm::mat4(1.0f);
 
     // Camera
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)1280 / (float)720, 0.1f, 100.0f);
@@ -77,7 +77,7 @@ void App::Loop()
         projection = glm::perspective(glm::radians(45.0f), ar, 0.1f, 100.0f);
         defaultShader.setMat4("projection", projection);
 
-        engine.PreFrame();
+        GLEngine::GLEngine::PreFrame();
         // Render stuff here.
 
         ui.StartUI();

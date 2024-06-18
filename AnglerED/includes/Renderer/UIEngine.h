@@ -11,8 +11,8 @@ namespace UIEngine
         UIEngine(bool);
         ~UIEngine();
         void UIShutdown();
-        void Init(jWindowManager::IWindow &);
-        void StartUI();
+        void Init(jWindowManager::IWindow &) const;
+        void StartUI() const;
         void EndUI();
 
     private:

@@ -28,11 +28,11 @@ namespace DS
         Node<T> *m_parent;
         T entity;
         uint8_t flags = 0x00;
-        std::string name;
+        std::string m_name;
 
       public:
         Node();
-        Node(T);
+        explicit Node(T);
         ~Node();
 
         const std::vector<Node<T> *> &getChildren() const;
@@ -40,13 +40,13 @@ namespace DS
         const Node<T> *getParent() const;
         const T &getEntity() const;
         T &getEntity();
-        std::string getName() const;
+        [[nodiscard]] std::string getName() const;
         void setName(std::string &name);
         void setName(const char *);
         void setFlag(NODE_FLAGS);
         bool checkFlag(NODE_FLAGS);
         void addChild(Node<T> *);
-        bool isLeaf() const;
+        [[nodiscard]] bool isLeaf() const;
     };
 
     template <typename T> bool Node<T>::checkFlag(NODE_FLAGS flag)
@@ -62,14 +62,14 @@ namespace DS
     template <typename T> Node<T>::Node()
     {
         m_parent = nullptr;
-        name = "Untitled";
+        m_name = "Untitled";
     }
 
     template <typename T> inline Node<T>::Node(T e)
     {
         m_parent = nullptr;
         entity = e;
-        name = "Untitled Entity";
+        m_name = "Untitled Entity";
     }
 
     template <typename T> inline Node<T>::~Node()
@@ -114,17 +114,17 @@ namespace DS
 
     template <typename T> inline std::string Node<T>::getName() const
     {
-        return name;
+        return m_name;
     }
 
     template <typename T> inline void Node<T>::setName(std::string &name)
     {
-        this->name = name;
+        m_name = name;
     }
 
     template <typename T> inline void Node<T>::setName(const char *name)
     {
-        this->name = name;
+        m_name = name;
     }
 
     template <typename T> inline void Node<T>::addChild(Node<T> *node)
@@ -155,7 +155,7 @@ namespace DS
     {
         glm::mat4 transform;
         Transform() : transform(1.0f){};
-        Transform(glm::mat4 &m) : transform(m){};
+        explicit Transform(glm::mat4 &m) : transform(m){};
     };
 
 } // namespace DS

@@ -23,7 +23,7 @@ namespace SceneManager
         m_registry.emplace<Transform>(m, mesh.m_transformation);
         m_registry.emplace<MeshRenderer>(m, filter, material_pool);
 
-        DS::ENode *_node = new DS::ENode(m);
+        auto *_node = new DS::ENode(m);
         _node->setName(node->getName().c_str());
 
         for (const auto &i : node->getChildren())
@@ -135,6 +135,7 @@ namespace SceneManager
             spdlog::warn("SCENE MANAGER {}", "Model has no mesh data");
             return;
         }
+        spdlog::info("SceneManager::Add - Loading Model");
 
         std::shared_ptr<MeshNode> meshNode = model.m_root;
         MeshFilter filter = model.m_mesh;
@@ -158,6 +159,7 @@ namespace SceneManager
 
         DS::ENode *_n = node ? node : m_sceneGraph.getRootNode();
         _n->addChild(copiedNode);
+        spdlog::info("SceneManager::Add - Loaded Model {}", _n->getName());
     }
 
     void SceneManager::Add(GLEngine::Camera &camera, DS::ENode *node)
@@ -165,7 +167,7 @@ namespace SceneManager
         const auto &entity = m_registry.create();
         m_registry.emplace<GLEngine::Camera>(entity, camera);
 
-        DS::ENode *n = new DS::ENode(entity);
+        auto *n = new DS::ENode(entity);
         n->setName("Camera");
 
         DS::ENode *_n = node ? node : m_sceneGraph.getRootNode();

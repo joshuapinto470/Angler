@@ -15,16 +15,16 @@ namespace UIEngine
     class ViewportWidget : public UIWidget
     {
       private:
-        SceneManager::SceneManager *m_scene;
-        GLEngine::FrameBuffer framebuffer;
-        unsigned m_width, m_height;
+        SceneManager::SceneManager *m_scene{};
+        GLEngine::FrameBuffer framebuffer{};
+        unsigned m_width{}, m_height{};
 
       public:
-        ViewportWidget(std::string);
+        explicit ViewportWidget(const char *);
         void SetScene(SceneManager::SceneManager *);
-        glm::vec2 getViewportDim()
+        [[nodiscard]] glm::vec2 getViewportDim() const
         {
-            return glm::vec2(m_width, m_height);
+            return {m_width, m_height};
         };
         void Render() override;
     };
@@ -37,7 +37,7 @@ namespace UIEngine
         void Draw(DS::ENode *);
 
       public:
-        WSceneViewer(std::string);
+        explicit WSceneViewer(const char *);
         void SetScene(SceneManager::SceneManager *);
         void Render() override;
     };
@@ -45,11 +45,11 @@ namespace UIEngine
     class WSettings : public UIWidget
     {
       private:
-        SceneManager::SceneManager *m_scene;
+        SceneManager::SceneManager *m_scene{};
         ImGuiTreeNodeFlags flags;
 
       public:
-        WSettings(std::string);
+        explicit WSettings(const char *);
         void SetScene(SceneManager::SceneManager *);
         void Render() override;
     };
@@ -57,7 +57,7 @@ namespace UIEngine
     class WInfo : public UIWidget
     {
       public:
-        WInfo(std::string);
+        explicit WInfo(const char *);
         void Render() override;
     };
 

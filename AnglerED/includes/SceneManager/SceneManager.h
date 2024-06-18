@@ -30,8 +30,8 @@ namespace SceneManager
     class SceneManager
     {
       private:
-        SceneGraph m_sceneGraph;
-        GLRenderer::Renderer m_renderer;
+        SceneGraph m_sceneGraph{};
+        GLRenderer::Renderer m_renderer{};
         entt::registry m_registry;
 
         // Scene state

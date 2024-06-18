@@ -22,7 +22,7 @@ namespace GLEngine
         void Render() const;
         void Destroy();
         void Bind() const;
-        void Unbind() const;
+        static void Unbind() ;
     };
 
     class IndexedBuffer
@@ -38,7 +38,7 @@ namespace GLEngine
         void Render() const;
         void Destroy();
         void Bind() const;
-        void Unbind() const;
+        static void Unbind() ;
     };
 
     class FrameBuffer
@@ -53,9 +53,9 @@ namespace GLEngine
         ~FrameBuffer();
         void Init(unsigned, unsigned);
         void Bind() const;
-        void Unbind() const;
+        static void Unbind() ;
         void Clear() const;
-        void RescaleBuffer(float, float);
+        void RescaleBuffer(float, float) const;
         GLuint getTexture()
         {
             return m_texture;
@@ -66,8 +66,8 @@ namespace GLEngine
     {
       public:
         GLEngine() = default;
-        void Init();
-        void PreFrame();
+        static void Init();
+        static void PreFrame();
         void PostFrame();
         void End();
     };

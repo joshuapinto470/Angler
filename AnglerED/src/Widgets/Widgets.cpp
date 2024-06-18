@@ -5,7 +5,7 @@ namespace UIEngine
 {
 
     // Viewport widget
-    ViewportWidget::ViewportWidget(std::string title)
+    ViewportWidget::ViewportWidget(const char * title)
     {
         m_uiTitle = title;
         framebuffer.Init(1280, 720);
@@ -46,11 +46,11 @@ namespace UIEngine
         framebuffer.Clear();
         framebuffer.Bind();
         m_scene->Render();
-        framebuffer.Unbind();
+        GLEngine::FrameBuffer::Unbind();
     }
 
     // Settings widget
-    WSettings::WSettings(std::string title)
+    WSettings::WSettings(const char * title)
     {
         m_uiTitle = title;
         flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
@@ -75,14 +75,14 @@ namespace UIEngine
         ImGui::Text("%s", node->getName().c_str());
         ImGui::Separator();
 
-        DS::Transform *t = m_scene->getComponent<DS::Transform>(node);
+        auto *t = m_scene->getComponent<DS::Transform>(node);
         if (t && (ImGui::TreeNodeEx("Transform", flags, "Transform")))
         {
             WTransform(t);
             ImGui::TreePop();
         }
 
-        GLEngine::MeshRenderer *m = m_scene->getComponent<GLEngine::MeshRenderer>(node);
+        auto *m = m_scene->getComponent<GLEngine::MeshRenderer>(node);
         if (m && (ImGui::TreeNodeEx("_MeshRenderer", flags, "MeshRenderer")))
         {
             WMeshRenderer(m);
@@ -97,7 +97,7 @@ namespace UIEngine
     }
 
     // Info Widget
-    WInfo::WInfo(std::string title)
+    WInfo::WInfo(const char * title)
     {
         m_uiTitle = title;
     }
@@ -111,7 +111,7 @@ namespace UIEngine
 
     // Sceneviewer widget
 
-    WSceneViewer::WSceneViewer(std::string name)
+    WSceneViewer::WSceneViewer(const char * name)
     {
         m_uiTitle = name;
         m_scene = nullptr;

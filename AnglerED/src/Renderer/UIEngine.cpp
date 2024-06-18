@@ -8,8 +8,7 @@ namespace UIEngine
     }
 
     UIEngine::~UIEngine()
-    {
-    }
+    = default;
 
     void UIEngine::UIShutdown()
     {
@@ -18,7 +17,7 @@ namespace UIEngine
         ImGui::DestroyContext();
     }
 
-    void UIEngine::Init(jWindowManager::IWindow &window)
+    void UIEngine::Init(jWindowManager::IWindow &window) const
     {
         const char *glsl_version = "#version 130";
         IMGUI_CHECKVERSION();
@@ -36,7 +35,7 @@ namespace UIEngine
         ImGui_ImplOpenGL3_Init(glsl_version);
     }
 
-    void UIEngine::StartUI()
+    void UIEngine::StartUI() const
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

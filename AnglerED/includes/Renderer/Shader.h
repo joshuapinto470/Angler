@@ -10,7 +10,7 @@ class Shader {
    public:
     Shader();
     Shader(const char *, const char *);
-    void use();
+    void use() const;
     void setInt(const std::string &, int) const;
     void setBool(const std::string &, bool) const;
     void setFloat(const std::string &, float) const;
