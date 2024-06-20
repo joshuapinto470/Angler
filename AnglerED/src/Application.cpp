@@ -19,16 +19,18 @@ void App::Init()
     window.Init(1280, 720, "AnglerED");
     ui.Init(window);
     GLEngine::GLEngine::Init();
+    // Manager can only be created after the engine has been started.
+    manager = new SceneManager::SceneManager("Scene 1");
+    manager->Init();
 }
 
 void App::Loop()
 {
     AssimpLoader loader;
-    Model mModel = loader.LoadModel("/home/joshua/Projects/Angler/res/models/Basic gltf/basic.glb");
+    Model _model = loader.LoadModel("/home/joshua/Projects/Angler/res/models/Basic gltf/basic2.glb");
     // Model mModel2 = loader.LoadModel("/home/joshua/3DModels/external/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf");
 
-    auto *manager = new SceneManager::SceneManager();
-    manager->Add(mModel, nullptr);
+    manager->Add(_model, nullptr);
     // manager->Add(mModel2, nullptr);
 
     UIEngine::ViewportWidget viewport = UIEngine::ViewportWidget( "Viewport");
@@ -38,7 +40,7 @@ void App::Loop()
     UIEngine::WSceneViewer viewer = UIEngine::WSceneViewer("Scene hierarchy");
     viewer.SetScene(manager);
 
-    UIEngine::WSettings setting = UIEngine::WSettings("Inspector");
+    UIEngine::WSettings setting = UIEngine::WSettings("Node Inspector");
     setting.SetScene(manager);
 
     Shader defaultShader = manager->getDefaultShader();

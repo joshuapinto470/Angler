@@ -16,6 +16,7 @@ private:
     GLEngine::GLEngine engine;
     UIEngine::UIEngine ui;
     jWindowManager::WindowManager window;
+    SceneManager::SceneManager* manager;
 
 public:
     App();

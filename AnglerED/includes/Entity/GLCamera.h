@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pch.h>
+#include "GLEngine.h"
 
 namespace GLEngine
 {
@@ -18,6 +19,5 @@ namespace GLEngine
 
         void setView(glm::mat4& view);
         void setProjection(glm::mat4& projection);
-         
     };
 } // namespace GLEngine

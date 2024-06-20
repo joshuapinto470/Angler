@@ -40,15 +40,17 @@ namespace SceneManager
         std::vector<GLEngine::TextureList> m_textureBucket;
         std::vector<GLEngine::MaterialList> m_materialBucket;
         std::map<std::string, Shader> m_shaders;
+        std::map<std::string, GLEngine::Camera> m_cameraBucket;
 
-        std::string name;
+        std::string m_name;
 
         DS::ENode *deepCopy(const MeshNode *);
 
       public:        
-        SceneManager();
+        explicit SceneManager(const char*);
         ~SceneManager();
         void Render();
+        void Init();
         void Add(const Model &, DS::ENode *);
         void Add(GLEngine::Light &, DS::ENode *);
         void Add(GLEngine::Camera &, DS::ENode *);

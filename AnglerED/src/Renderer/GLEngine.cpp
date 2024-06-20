@@ -120,7 +120,7 @@ namespace GLEngine
 // Index Buffer
 namespace GLEngine
 {
-    int IndexedBuffer::Init(const std::vector<Vertex> &vertices, const std::vector<unsigned> &indices)
+    void IndexedBuffer::Init(const std::vector<Vertex> &vertices, const std::vector<unsigned> &indices)
     {
         size = indices.size();
         glGenVertexArrays(1, &VAO);
@@ -156,7 +156,6 @@ namespace GLEngine
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        return 0;
     }
 
     void IndexedBuffer::Render() const
@@ -166,6 +165,12 @@ namespace GLEngine
 
     void IndexedBuffer::Destroy()
     {
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+        glDeleteBuffers(1, &EBO);
+        VAO = 0;
+        VBO = 0;
+        EBO = 0;
     }
 
     void IndexedBuffer::Bind() const
@@ -173,7 +178,7 @@ namespace GLEngine
         glBindVertexArray(VAO);
     }
 
-    void IndexedBuffer::Unbind()
+    void IndexedBuffer::Unbind() const
     {
         glBindVertexArray(0);
     }
@@ -215,7 +220,7 @@ namespace GLEngine
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     }
 
-    void FrameBuffer::Unbind()
+    void FrameBuffer::Unbind() const
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }

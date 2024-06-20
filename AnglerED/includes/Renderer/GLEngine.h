@@ -14,9 +14,7 @@ namespace GLEngine
         unsigned size;
 
       public:
-        VertexBuffer() : VBO(0), VAO(0), size(0)
-        {
-        }
+        VertexBuffer() : VBO(0), VAO(0), size(0){}
         // ~VertexBuffer();
         int Init(const std::vector<DS::Vertex> &);
         void Render() const;
@@ -29,16 +27,16 @@ namespace GLEngine
     {
       private:
         GLuint VBO, VAO, EBO;
-        unsigned size;
+        unsigned size{};
 
       public:
         IndexedBuffer() : VBO(0), VAO(0), EBO(0){};
-        int Init(const std::vector<DS::Vertex> &, const std::vector<unsigned> &);
 
+        void Init(const std::vector<DS::Vertex> &, const std::vector<unsigned> &);
         void Render() const;
         void Destroy();
         void Bind() const;
-        static void Unbind() ;
+        void Unbind() const ;
     };
 
     class FrameBuffer
@@ -53,10 +51,10 @@ namespace GLEngine
         ~FrameBuffer();
         void Init(unsigned, unsigned);
         void Bind() const;
-        static void Unbind() ;
+        void Unbind() const;
         void Clear() const;
         void RescaleBuffer(float, float) const;
-        GLuint getTexture()
+        [[nodiscard]] GLuint getTexture() const
         {
             return m_texture;
         };

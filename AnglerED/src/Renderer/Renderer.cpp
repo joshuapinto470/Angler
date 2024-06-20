@@ -2,6 +2,11 @@
 
 namespace GLRenderer
 {
+    void RenderQueue::Submit(GLRenderer::RenderCommand *command)
+    {
+        commandQueue.push_back(command);
+    }
+
     void Renderer::Draw()
     {
         

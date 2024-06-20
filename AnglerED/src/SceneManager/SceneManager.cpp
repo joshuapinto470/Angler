@@ -1,4 +1,5 @@
 #include <SceneManager.h>
+#include <stack>
 
 namespace SceneManager
 {
@@ -34,20 +35,42 @@ namespace SceneManager
         return _node;
     }
 
-    SceneManager::SceneManager()
+    SceneManager::SceneManager(const char* sceneName)
     {
         m_currActive = nullptr;
         // This is a weird workaround for now
         const auto &e = m_registry.create();
         m_registry.destroy(e);
-        Shader defaultShader = Shader("/home/joshua/Projects/Angler/AnglerED/shaders/base.vert",
-                                      "/home/joshua/Projects/Angler/AnglerED/shaders/base.frag");
 
-        m_shaders["default_shader"] = defaultShader;
+        m_shaders["default_shader"] = Shader("/home/joshua/Projects/Angler/AnglerED/shaders/base.vert",
+                                             "/home/joshua/Projects/Angler/AnglerED/shaders/base.frag");
 
-        name = "Scene 1";
+        m_name = sceneName;
         DS::ENode *root = m_sceneGraph.getRootNode();
-        root->setName(name);
+        root->setName(m_name);
+    }
+
+    void SceneManager::Init()
+    {
+        // Create a default camera.
+        float fov = glm::radians(45.0f);
+        float ar = 16.0f / 9.0f;
+
+        auto eye = glm::vec3(0.0f, 2.0f, 5.0f);
+        auto lookAt = glm::vec3(0.0f, 0.0f, 0.0f);
+        auto up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+        glm::mat4 projection = glm::perspective(fov, ar, 0.1f, 100.0f);
+        glm::mat4 view = glm::lookAt(eye, lookAt, up);
+
+        GLEngine::Camera _camera(projection, view);
+
+        DS::ENode *root = m_sceneGraph.getRootNode();
+        const auto& e = m_registry.create();
+        m_registry.emplace<GLEngine::Camera>(e, _camera);
+        auto *camEntity = new DS::ENode (e);
+        camEntity->setName("Camera 1");
+        root->addChild(camEntity);
     }
 
     SceneManager::~SceneManager()
@@ -71,12 +94,12 @@ namespace SceneManager
 
         DS::ENode *root = m_sceneGraph.getRootNode();
 
-        std::vector<DS::ENode *> stack;
-        stack.push_back(root);
+        std::stack<DS::ENode *> stack;
+        stack.push(root);
         while (!stack.empty())
         {
-            DS::ENode *node = stack.back();
-            stack.pop_back();
+            DS::ENode *node = stack.top();
+            stack.pop();
 
             if (node->checkFlag(DS::NODE_FLAGS::HIDDEN))
             {
@@ -121,7 +144,7 @@ namespace SceneManager
 
             for (const auto &c : node->getChildren())
             {
-                stack.push_back(c);
+                stack.push(c);
             }
         }
     }
@@ -135,7 +158,6 @@ namespace SceneManager
             spdlog::warn("SCENE MANAGER {}", "Model has no mesh data");
             return;
         }
-        spdlog::info("SceneManager::Add - Loading Model");
 
         std::shared_ptr<MeshNode> meshNode = model.m_root;
         MeshFilter filter = model.m_mesh;
@@ -159,7 +181,6 @@ namespace SceneManager
 
         DS::ENode *_n = node ? node : m_sceneGraph.getRootNode();
         _n->addChild(copiedNode);
-        spdlog::info("SceneManager::Add - Loaded Model {}", _n->getName());
     }
 
     void SceneManager::Add(GLEngine::Camera &camera, DS::ENode *node)

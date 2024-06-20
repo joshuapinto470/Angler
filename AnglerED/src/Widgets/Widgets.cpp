@@ -46,14 +46,14 @@ namespace UIEngine
         framebuffer.Clear();
         framebuffer.Bind();
         m_scene->Render();
-        GLEngine::FrameBuffer::Unbind();
+        framebuffer.Unbind();
     }
 
     // Settings widget
     WSettings::WSettings(const char * title)
     {
         m_uiTitle = title;
-        flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+        flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_Framed;
     }
 
     void WSettings::Render()
@@ -88,6 +88,33 @@ namespace UIEngine
             WMeshRenderer(m);
             ImGui::TreePop();
         }
+
+        auto *c = m_scene->getComponent<GLEngine::Camera>(node);
+        if (c && (ImGui::TreeNodeEx("_CameraTransform", flags, "Transform")))
+        {
+            glm::mat4 _t = c->getView();
+            glm::mat4 camTransform = glm::inverse(_t);
+            DS::Transform trans(camTransform);
+            WTransform(&trans);
+            ImGui::TreePop();
+        }
+
+        if (c && (ImGui::TreeNodeEx("_CameraProperties", flags, "Camera")))
+        {
+            glm::mat4 _p = c->getProjection();
+            float fov = 2 * glm::atan(1 / _p[1][1]) * (180.0f / glm::pi<float>());
+            float nearPlane = _p[3][2] / (_p[2][2] - 1.0f);
+            float farPlane = _p[3][2] / (_p[2][2] + 1.0f);
+            if (ImGui::InputFloat("FOV", &fov))
+            {
+                spdlog::info("Changed!");
+            }
+            ImGui::Text("Near Plane %.2f", farPlane);
+            ImGui::Text("Far Plane %.2f", nearPlane);
+
+            ImGui::TreePop();
+        }
+
         ImGui::End();
     }
 

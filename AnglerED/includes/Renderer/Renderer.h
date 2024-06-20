@@ -14,19 +14,28 @@ Renderer - Sort & execute the render commands.
 
 namespace GLRenderer
 {
-    enum RenderCommand
+    using namespace GLEngine;
+//    enum RenderCommand
+//    {
+//        DRAW_ELEMENTS,
+//        DRAW_INDICES,
+//        CLEAR,
+//    };
+
+    class RenderCommand
     {
-        DRAW_ELEMENTS,
-        DRAW_INDICES,
-        CLEAR,
+    public:
+        virtual void execute() = 0;
     };
 
     class RenderQueue
     {
       public:
-        void Submit(RenderCommand &);
+        void Submit(RenderCommand *command);
+        void Clear();
 
       private:
+        std::vector<RenderCommand *> commandQueue;
     };
 
     class Renderer
